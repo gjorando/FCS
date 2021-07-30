@@ -18,4 +18,4 @@ tests/.coverage
 build/
 tests/report/
 .venv
-
+/static/
