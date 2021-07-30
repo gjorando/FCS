@@ -17,7 +17,10 @@ class PlayerInlineForm(forms.ModelForm):
                   "assists", "result")
 
     def __init__(self, *args, **kwargs):
-        player_id = kwargs["prefix"].split("-")[1]
+        try:
+            player_id = kwargs["prefix"].split("-")[1]
+        except KeyError:
+            player_id = -1
         try:
             player_id = int(player_id)  # Entries for each player
         except ValueError:
