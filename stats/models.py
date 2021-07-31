@@ -44,16 +44,15 @@ class Game(models.Model):
     class Meta:
         verbose_name = "Partie"
 
-    date = models.DateField("Date du match")
+    date = models.DateTimeField("Date du match")
     season = models.PositiveIntegerField("Saison",
                                          validators=[MinValueValidator(1)])
     is_won = models.BooleanField("Partie gagnée", default=False)
 
     def __str__(self):
-        return "Partie n°{} ({}, saison {})".format(
-            self.pk,
-            self.date.strftime("%d/%m/%Y"),
-            self.season
+        return "Partie du {} ({})".format(
+            self.date.strftime("%d/%m/%Y à %H:%M"),
+            "gagnée" if self.is_won else "perdue"
         )
 
 class Player(models.Model):
@@ -73,3 +72,14 @@ class Player(models.Model):
     kills = models.PositiveIntegerField("Nombre de KOs")
     assists = models.PositiveIntegerField("Nombre d'assists")
     result = models.PositiveIntegerField("Note globale")
+
+    def __str__(self):
+        return "{}: {}({}) S{}/K{}/A{}/{}".format(
+            "Adversaire" if self.is_opponent else "FCS",
+            self.pseudo,
+            self.get_pokemon_display(),
+            self.scored,
+            self.kills,
+            self.assists,
+            self.result
+        )

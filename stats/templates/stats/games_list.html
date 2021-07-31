@@ -1,0 +1,14 @@
+{% extends 'stats/base.html' %}
+
+{% block content %}
+<h1>{{ page_title }}</h1>
+{% if games|length_is:"0" %}
+    <p>Aucune partie enregistrée présentement.</p>
+{% else %}
+    <ul>
+    {% for game in games %}
+        <li><a href="{% url 'game_detail' game_id=game.pk %}">{{ game }}</a></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

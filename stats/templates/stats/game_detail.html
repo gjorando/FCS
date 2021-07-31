@@ -1,0 +1,11 @@
+{% extends 'stats/base.html' %}
+
+{% block content %}
+<a href="{% url 'games_list' %}">Retour</a>
+<h1>{{ page_title }}</h1>
+<ul>
+{% for player in players %}
+    <li>{{ player }}</li>
+{% endfor %}
+</ul>
+{% endblock %}
