@@ -1,3 +1,50 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* GENERAL RULES */
+
+main, footer, header
+{
+    @apply p-5;
+}
+
+main h1
+{
+    @apply font-bold text-5xl mb-3;
+}
+
+main h2
+{
+    @apply font-bold text-3xl mb-3;
+}
+
+main p
+{
+    @apply my-4;
+}
+
+a
+{
+    @apply text-blue-800 hover:underline;
+}
+
+/* GAME_DETAIL_BASE SPECIAL RULES*/
+
+.game-detail-ally
+{
+    @apply text-green-800;
+}
+
+.game-detail-opponent
+{
+    @apply text-red-800;
+}
+
+@layer components
+{
+    .score-grid
+    {
+        @apply grid grid-cols-4 gap-1 justify-items-center;
+    }
+}
