@@ -48,8 +48,8 @@ class Game(models.Model):
     date = models.DateTimeField("Date du match")
     season = models.PositiveIntegerField("Saison", validators=[MinValueValidator(1)])
     is_won = models.BooleanField("Partie gagnée", default=False)
-    score_allies = models.PositiveIntegerField("Score allié", validators=[MinValueValidator(1)])
-    score_opponents = models.PositiveIntegerField("Score opposants", validators=[MinValueValidator(1)])
+    score_allies = models.PositiveIntegerField("Score allié")
+    score_opponents = models.PositiveIntegerField("Score opposants")
 
     def __str__(self):
         return "Partie du {} ({})".format(
