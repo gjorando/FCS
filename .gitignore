@@ -1,6 +1,6 @@
 .spyproject
 *.sqlite3
-fcs/settings.py
+fcs/settings_production.py
 bak/
 *.egg-info
 *.pot
