@@ -24,7 +24,7 @@ main p
     @apply my-4;
 }
 
-a
+a, .link-like
 {
     @apply text-blue-800 hover:underline;
 }

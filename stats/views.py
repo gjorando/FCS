@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import Game
 from . import utils
+from .forms import GamesListFilterForm
 
 
 def games_list(request):
@@ -12,12 +13,30 @@ def games_list(request):
     """
 
     page_number = request.GET.get("page")
-    try:
-        items_per_page = int(request.GET.get("per_page"))
-    except TypeError:
-        items_per_page = 10
 
-    games = Game.objects.all().order_by("-date")
+    if request.method == "GET":
+        filter_form = GamesListFilterForm(request.GET)
+        filter_form.is_valid()
+        items_per_page = filter_form.cleaned_data.get("per_page") or 10
+        season_filter = filter_form.cleaned_data.get("season") or None
+    else:
+        items_per_page = 10
+        season_filter = None
+
+    url_get_encode = request.GET.copy()
+    if "page" in url_get_encode:
+        url_get_encode.pop("page")
+    url_get_encode = url_get_encode.urlencode()
+
+    filter_form = GamesListFilterForm(initial={
+        "per_page": items_per_page,
+        "season": season_filter
+    })
+
+    if season_filter:
+        games = Game.objects.filter(season=season_filter).order_by("-date")
+    else:
+        games = Game.objects.all().order_by("-date")
 
     paginator = Paginator(games, items_per_page)
     games = paginator.get_page(page_number)
@@ -28,7 +47,8 @@ def games_list(request):
         "page_title": "Parties jouées",
         "games": games_info,
         "page_obj": games,
-        "items_per_page": items_per_page,
+        "url_get_encode": url_get_encode,
+        "filter_form": filter_form,
     }
 
     return render(request, "stats/games_list.html", context)

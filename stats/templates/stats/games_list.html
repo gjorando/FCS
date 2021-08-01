@@ -2,11 +2,23 @@
 
 {% block content %}
 <h1>{{ page_title }}</h1>
+<div class="p-4 text-center 2xl:absolute 2xl:top-0 2xl:left-0">
+    <div class="font-bold mb-2">Filtres</div>
+    <form class="flex flex-col justify-center" action="{% url 'games_list' %}" method="get">
+        {{ filter_form }}
+        <input class="w-max mx-auto link-like mt-2" type="submit" value="Appliquer">
+        <a href="{% url 'games_list' %}">Réinitialiser</a>
+    </form>
+</div>
+
 {% if games|length_is:"0" %}
     <p>Aucune partie enregistrée présentement.</p>
 {% else %}
     <ul class="space-y-4">
     {% for game in games %}
+        {% ifchanged %}
+            <li class="text-center font-bold border-t-2">{{ game.date|date:"j F Y" }}</li>
+        {% endifchanged %}
         <li>
             <a class="text-2xl font-bold" title="{{ game.date }}" href="{% url 'game_detail' game_id=game.pk %}">{{ game.teams.0.score }} - {{ game.teams.1.score }} ({{ game.is_won|yesno:"victoire,défaite" }})</a>
             {% include 'stats/game_detail_base.html' %}

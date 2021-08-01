@@ -12,12 +12,12 @@
     <body class="bg-gray-100">
         <div class="container mx-auto flex flex-col gap-5 divide-y divide-gray-400">
         <header class="flex flex-col justify-center lg:flex-row gap-4 lg:gap-16">
-        <img class="h-28" src="{% static 'stats/img/logo.svg' %}" alt="FC Saucisse">
-        <h1 class="text-center font-bold text-6xl self-center">Statistiques de jeu</h1>
+            <a href="{% url 'games_list' %}"><img class="h-28" src="{% static 'stats/img/logo.svg' %}" alt="FC Saucisse"></a>
+            <h1 class="text-center font-bold text-6xl self-center">Statistiques de jeu</h1>
         </header>
 
-        <main class="py-8 sm:p-16 grid grid-cols-1 justify-items-center">
-        {% block content %}{% endblock %}
+        <main class="2xl:relative py-8 sm:p-16 grid grid-cols-1 justify-items-center">
+            {% block content %}{% endblock %}
         </main>
 
         <footer>
