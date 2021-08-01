@@ -35,6 +35,7 @@ LIST_POKEMONS = [
     ))
 ]
 
+
 class Game(models.Model):
     """
     Stores the results of a game as well as the individual results of each
@@ -45,9 +46,10 @@ class Game(models.Model):
         verbose_name = "Partie"
 
     date = models.DateTimeField("Date du match")
-    season = models.PositiveIntegerField("Saison",
-                                         validators=[MinValueValidator(1)])
+    season = models.PositiveIntegerField("Saison", validators=[MinValueValidator(1)])
     is_won = models.BooleanField("Partie gagnée", default=False)
+    score_allies = models.PositiveIntegerField("Score allié", validators=[MinValueValidator(1)])
+    score_opponents = models.PositiveIntegerField("Score opposants", validators=[MinValueValidator(1)])
 
     def __str__(self):
         return "Partie du {} ({})".format(
@@ -55,7 +57,8 @@ class Game(models.Model):
             "gagnée" if self.is_won else "perdue"
         )
 
-class Player(models.Model):
+
+class PlayerStat(models.Model):
     """
     Stores the results of a player for a given game.
     """
@@ -65,8 +68,7 @@ class Player(models.Model):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     pseudo = models.CharField("Pseudo", max_length=64)
-    pokemon = models.CharField("Pokémon joué", max_length=64,
-                               choices=LIST_POKEMONS)
+    pokemon = models.CharField("Pokémon joué", max_length=64, choices=LIST_POKEMONS)
     is_opponent = models.BooleanField("Joueur adverse")
     scored = models.PositiveIntegerField("Points marqués")
     kills = models.PositiveIntegerField("Nombre de KOs")

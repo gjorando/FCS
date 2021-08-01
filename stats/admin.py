@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 
-from .models import Game, Player
+from .models import Game, PlayerStat
 
 DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
 DEFAULT_POKEMONS = ["ZERAORA", "LUCARIO", "PIKACHU", "CRAMORANT", "SNORLAX"]
@@ -12,7 +12,7 @@ class PlayerInlineForm(forms.ModelForm):
     """
 
     class Meta:
-        model = Player
+        model = PlayerStat
         fields = ("pseudo", "pokemon", "is_opponent", "scored", "kills",
                   "assists", "result")
 
@@ -56,7 +56,7 @@ class PlayerInline(admin.TabularInline):
     Displays exactly ten players when creating a game.
     """
 
-    model = Player
+    model = PlayerStat
     form = PlayerInlineForm
     fieldsets = []
     extra = 10
