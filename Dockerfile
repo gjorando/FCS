@@ -7,5 +7,5 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
   && apt-get clean
 
-COPY requirements.txt
+COPY requirements.txt ./
 RUN pip install -r requirements.txt
