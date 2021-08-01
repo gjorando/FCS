@@ -35,7 +35,7 @@
      inkscape:window-x="0"
      inkscape:window-y="32"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer6"
+     inkscape:current-layer="layer4"
      showguides="true"
      inkscape:guide-bbox="true"
      height="89.78571mm"
@@ -409,7 +409,7 @@
          id="tspan1937"
          style="stroke-width:0.264583"
          x="151.29898"
-         y="91.339012"></tspan></text>
+         y="91.339012" /></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -607,16 +607,22 @@
      id="layer4"
      inkscape:label="text"
      style="display:inline">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="102.37778"
-       y="66.390266"
-       id="text7118"><tspan
-         sodipodi:role="line"
-         id="tspan7116"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:52.9167px;font-family:'Full Pack 2025';-inkscape-font-specification:'Full Pack 2025, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="102.37778"
-         y="66.390266">FCS</tspan></text>
+    <g
+       aria-label="FCS"
+       id="text7118"
+       style="font-size:10.5833px;line-height:1.25;stroke-width:0.264583">
+      <path
+         d="m 115.76198,64.529914 5.271,-13.229175 h 16.53647 l 3.82406,-9.508469 h -16.38144 l 2.53214,-7.027999 h 24.90806 l 3.82406,-9.508469 H 119.12095 L 103.35963,64.529914 Z M 94.677984,70.421031 115.14186,19.364685 h 49.86779 l -8.57829,21.290703 h -24.75303 l 1.757,-4.754235 h 16.6915 l -8.57829,21.290703 h -16.53647 l -5.271,13.229175 z"
+         style="font-size:52.9167px;font-family:'Full Pack 2025';-inkscape-font-specification:'Full Pack 2025, Normal'"
+         id="path902" />
+      <path
+         d="m 186.76544,64.529914 5.11597,-12.815763 h -21.13567 l 5.4777,-13.642586 h 21.13568 l 5.11597,-12.815763 h -36.79365 l -15.76132,39.274112 z m -45.52696,5.891117 20.46388,-51.056346 h 49.45437 l -9.81853,24.597996 h -21.13567 l -0.77515,1.860353 h 21.13568 l -9.81853,24.597997 z"
+         style="font-size:52.9167px;font-family:'Full Pack 2025';-inkscape-font-specification:'Full Pack 2025, Normal'"
+         id="path904" />
+      <path
+         d="m 238.54526,64.529914 9.09506,-22.737644 h -29.61061 l 2.53214,-7.027999 h 29.869 l 3.82406,-9.508469 h -42.11632 l -9.14673,22.737643 h 29.81732 l -2.89389,7.027999 h -29.71396 l -3.82406,9.50847 z m -50.84964,5.891117 8.52662,-21.290703 h 29.76564 l -1.9637,4.754234 H 194.31021 L 208.1595,19.364685 h 54.82873 l -8.57829,21.290703 h -29.71397 l 1.757,-4.754235 h 29.869 l -13.79762,34.519878 z"
+         style="font-size:52.9167px;font-family:'Full Pack 2025';-inkscape-font-specification:'Full Pack 2025, Normal'"
+         id="path906" />
+    </g>
   </g>
 </svg>
