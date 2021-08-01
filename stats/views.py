@@ -70,3 +70,17 @@ def game_detail(request, game_id):
     }
 
     return render(request, "stats/game_detail.html", context)
+
+
+def team_stats(request):
+    """
+    Displays a number of stats for the team.
+
+    :param request: Request object.
+    """
+
+    context = {
+        "page_title": "Statistiques d'équipe"
+    }
+
+    return render(request, "stats/team_stats.html", context)
