@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django import forms
 
-from .models import Game, PlayerStat
+from .models import Game, PlayerStat, Teammate
 
 DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
 DEFAULT_POKEMONS = ["ZERAORA", "LUCARIO", "PIKACHU", "CRAMORANT", "SNORLAX"]
+
 
 class PlayerInlineForm(forms.ModelForm):
     """
@@ -26,18 +27,24 @@ class PlayerInlineForm(forms.ModelForm):
         except ValueError:
             player_id = -1  # Other entries (which are skipped and not shown)
 
-        initial_values = {}
+        if not ("instance" in kwargs and kwargs["instance"]):
+            initial_values = {
+                "scored": 0,
+                "kills": 0,
+                "assists": 0,
+                "result": 10
+            }
 
-        if player_id < 0:  # We skip these entries
-            pass
-        elif player_id < 5:  # The 5 first entries are the ally team
-            # Pre-set the names of each player as well as their default Pokémon
-            initial_values["pseudo"] = DEFAULT_PLAYERS[player_id]
-            initial_values["pokemon"] = DEFAULT_POKEMONS[player_id]
-        else:  # The 5 last are the opposing team
-            initial_values["is_opponent"] = True
+            if player_id < 0:  # We skip these entries
+                pass
+            elif player_id < 5:  # The 5 first entries are the ally team
+                # Pre-set the names of each player as well as their default Pokémon
+                initial_values["pseudo"] = DEFAULT_PLAYERS[player_id]
+                initial_values["pokemon"] = DEFAULT_POKEMONS[player_id]
+            else:  # The 5 last are the opposing team
+                initial_values["is_opponent"] = True
 
-        kwargs["initial"] = initial_values
+            kwargs["initial"] = initial_values
 
         super(PlayerInlineForm, self).__init__(*args, **kwargs)
 
@@ -50,6 +57,7 @@ class PlayerInlineForm(forms.ModelForm):
             self.fields["is_opponent"].disabled = True
             if player_id < 5:
                 self.fields["pseudo"].disabled = True
+
 
 class PlayerInline(admin.TabularInline):
     """
@@ -64,6 +72,7 @@ class PlayerInline(admin.TabularInline):
     min_num = 10
     can_delete = False
 
+
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     """
@@ -72,3 +81,6 @@ class GameAdmin(admin.ModelAdmin):
 
     inlines = [PlayerInline]
     list_filter = ["season", "is_won"]
+
+
+admin.site.register(Teammate)
