@@ -58,42 +58,17 @@ class Game(models.Model):
             "gagnée" if self.is_won else "perdue"
         )
 
-    def clean(self):
-        # FIXME this is the state of playerstate_set before being created/modified, it should be done at the form step
-        # TODO check how to do this in the admin forms
-        players = self.playerstat_set.all()
-        player_names = []
-        ally_pokemons = []
-        opponent_pokemons = []
-        num_allies = 0
-        num_opponents = 0
 
-        for player in players:
-            if player.is_opponent:
-                num_opponents += 1
-                curr_team = opponent_pokemons
-                curr_teamname = "adverse"
-            else:
-                num_allies += 1
-                curr_team = ally_pokemons
-                curr_teamname = "alliée"
+def restrict_amount(value):
+    """
+    Validates the number of players in a game.
 
-            if player.pokemon in curr_team:
-                raise ValidationError("{} apparait au moins deux fois dans l'équipe {}.".format(
-                    player.get_pokemon_display(),
-                    curr_teamname
-                ))
-            else:
-                curr_team.append(player.pokemon)
-
-            if player.pseudo in player_names:
-                raise ValidationError("{} apparait au moins deux fois.".format(player.pseudo))
-            else:
-                player_names.append(player.pseudo)
-        if num_allies != 5:
-            raise ValidationError("L'équipe alliée doit faire exactement 5 joueurs.")
-        if num_opponents != 5:
-            raise ValidationError("L'équipe adverse doit faire exactement 5 joueurs.")
+    :param value: Game id.
+    """
+    # FIXME count exactly 5 players per team instead of maximum number for whole game
+    # Maybe use a constraint instead?
+    if PlayerStat.objects.filter(game=value).count() >= 10:
+        raise ValidationError("La partie à déjà 10 joueurs.")
 
 
 class PlayerStat(models.Model):
@@ -103,8 +78,12 @@ class PlayerStat(models.Model):
 
     class Meta:
         verbose_name = "Joueur"
+        constraints = [
+            models.UniqueConstraint(fields=["game", "pseudo"], name="no_duplicate_players"),
+            models.UniqueConstraint(fields=["game", "pokemon", "is_opponent"], name="no_duplicate_pokemons_in_team")
+        ]
 
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, validators=[restrict_amount,])
     pseudo = models.CharField("Pseudo", max_length=64)
     pokemon = models.CharField("Pokémon joué", max_length=64, choices=LIST_POKEMONS)
     is_opponent = models.BooleanField("Joueur adverse")
