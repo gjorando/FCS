@@ -1,3 +1,5 @@
 requests
 psycopg2-binary==2.8.6
 django-tailwind==2.2.0
+Pillow
+pytesseract
