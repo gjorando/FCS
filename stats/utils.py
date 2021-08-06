@@ -35,3 +35,11 @@ def construct_game_context(game):
         "is_won": game.is_won,
         "date": game.date,
     }
+
+
+def prefill_game():
+    """
+    Get informations about a game based on the screenshot of a game result.
+    """
+
+    pass
