@@ -1,6 +1,6 @@
 from django import forms
 
-from stats.models import PlayerStat
+from stats.models import PlayerStat, Game
 
 DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
 DEFAULT_POKEMONS = ["ZERAORA", "LUCARIO", "PIKACHU", "CRAMORANT", "SNORLAX"]
@@ -17,6 +17,16 @@ class GamesListFilterForm(forms.Form):
         return self.cleaned_data["season"] or None
 
 
+class GameAdminForm(forms.ModelForm):
+    """
+    Custom model form for the games.
+    """
+
+    class Meta:
+        model = Game
+        exclude = tuple()
+
+
 class PlayerInlineAdminForm(forms.ModelForm):
     """
     Custom model form for the players in a game.
@@ -24,8 +34,7 @@ class PlayerInlineAdminForm(forms.ModelForm):
 
     class Meta:
         model = PlayerStat
-        fields = ("pseudo", "pokemon", "is_opponent", "scored", "kills",
-                  "assists", "result")
+        exclude = tuple()
 
     def __init__(self, *args, **kwargs):
         try:

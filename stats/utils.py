@@ -105,6 +105,7 @@ def prefill_game(img):
 
         result[name] = pytesseract.image_to_string(cropped).strip()
 
+    preview = preview.crop((600, 50, 1260, 684))
     preview.save(output, format='PNG')
     output.seek(0)
     preview_img = b64encode(output.read()).decode("ascii")

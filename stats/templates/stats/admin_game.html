@@ -2,9 +2,8 @@
 {% load i18n admin_urls %}
 
 {% block form_top %}
-<a href="{% url opts|admin_urlname:'prefill' %}">Pré-remplissage de partie</a>
+<p><a href="{% url opts|admin_urlname:'prefill' %}">Pré-remplissage de partie</a></p>
 {% if img %}
-    <pre>{{ prefill_data }}</pre>
     <img src="data:image/png;base64,{{ img }}" alt="img">
 {% endif %}
 {% endblock %}

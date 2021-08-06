@@ -1,11 +1,10 @@
-from base64 import b64encode
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from .forms import PlayerInlineAdminForm, PrefillForm
+from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm
 from .models import Game, PlayerStat, Teammate
 from .utils import prefill_game
 
@@ -27,9 +26,10 @@ class PlayerInline(admin.TabularInline):
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     """
-    Register an admin entry for the Game table..
+    Register an admin entry for the Game table.
     """
 
+    form = GameAdminForm
     inlines = [PlayerInline]
     ordering = ("-date",)
     list_filter = ["season", "is_won"]
@@ -43,24 +43,28 @@ class GameAdmin(admin.ModelAdmin):
 
         return extra_urls + urls
 
-    def get_queryset(self, request):
-        # FIXME https://stackoverflow.com/questions/7513384/pass-initial-value-to-a-modelform-in-django
-        # https://stackoverflow.com/questions/727928/django-admin-how-to-access-the-request-object-in-admin-py-for-list-display-met
-        # https://stackoverflow.com/questions/51155947/django-redirect-to-another-view-with-context/51156032
-        qs = super(GameAdmin, self).get_queryset(request)
-        self.request = request
-        return qs
-
     def render_change_form(self, request, context, *args, **kwargs):
         self.change_form_template = 'stats/admin_game.html'
 
         extra_context = {}
         if "prefilled_img" in request.session:
             extra_context["img"] = request.session["prefilled_img"][1]
-            extra_context["prefill_data"] = request.session["prefilled_img"][0]
-            #del request.session["prefilled_img"]
+            # FIXME
+            # del request.session["prefilled_img"]
 
         return super(GameAdmin, self).render_change_form(request, context | extra_context, *args, **kwargs)
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(GameAdmin, self).get_form(request, obj, change, **kwargs)
+
+        # FIXME understand how to set the initial values
+        print(form().as_p())
+        if not change:
+            print("NEW")
+        else:
+            print("UPDATE")
+
+        return form
 
     def admin_prefill(self, request):
         """
