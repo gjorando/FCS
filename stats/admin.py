@@ -46,11 +46,13 @@ class GameAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, *args, **kwargs):
         self.change_form_template = 'stats/admin_game.html'
 
+        print(args, kwargs)
+
         extra_context = {}
-        if "prefilled_img" in request.session:
+        if "prefilled_img" in request.session and kwargs["add"]:
             extra_context["img"] = request.session["prefilled_img"][1]
             # FIXME
-            # del request.session["prefilled_img"]
+            del request.session["prefilled_img"]
 
         return super(GameAdmin, self).render_change_form(request, context | extra_context, *args, **kwargs)
 
@@ -58,7 +60,7 @@ class GameAdmin(admin.ModelAdmin):
         form = super(GameAdmin, self).get_form(request, obj, change, **kwargs)
 
         # FIXME understand how to set the initial values
-        print(form().as_p())
+        #print(form().as_p())
         if not change:
             print("NEW")
         else:
