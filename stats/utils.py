@@ -16,7 +16,8 @@ def construct_game_context(game):
     :return: A dict containing the context needed by the template.
     """
 
-    player_stats = game.playerstat_set.all().order_by("-result")
+    # TODO display MVP
+    player_stats = game.playerstat_set.all().order_by("-scored", "-result", "-pseudo")
 
     teams = [{}, {}]
 

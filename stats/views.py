@@ -95,6 +95,7 @@ def team_stats(request):
     else:
         games = Game.objects.all()
         opponent_stats = PlayerStat.objects.filter(is_opponent=True)
+        ally_stats = PlayerStat.objects.filter(is_opponent=False)
 
     # Compute winrate
     winrate = games.aggregate(
@@ -109,8 +110,7 @@ def team_stats(request):
 
     # Compute win-rate per opponent
     # 9 parties, 5 gagnées
-    per_opponent_winrate = opponent_stats.values("pokemon") \
-        .annotate(
+    per_opponent_winrate = opponent_stats.values("pokemon").annotate(
         winrate=100*Sum(
             Case(
                 When(game__is_won=True, then=Value(1))
@@ -119,10 +119,19 @@ def team_stats(request):
         )/Cast(Count("pokemon"), FloatField())
     ).order_by("-winrate").exclude(winrate=None)
 
+    # Compute averages per teammate
+    per_ally_averages = ally_stats.values("pseudo").annotate(
+        avg_scored=Avg("scored"),
+        avg_kills=Avg("kills"),
+        avg_assists=Avg("assists"),
+        avg_result=Avg("result")
+    ).order_by("-avg_result", "-avg_scored")
+
     context = {
         "page_title": "Statistiques d'équipe",
-        "win_percentage": winrate*100,
+        "win_percentage": winrate*100 if winrate else None,
         "per_opponent_winrate": per_opponent_winrate,
+        "per_ally_averages": per_ally_averages,
     }
 
     return render(request, "stats/team_stats.html", context)

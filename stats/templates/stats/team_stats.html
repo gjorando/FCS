@@ -3,7 +3,9 @@
 
 {% block content %}
     <h1>{{ page_title }}</h1>
+
     <h2>Taux de victoires</h2>
+    <p>Le taux de victoires par pokémon adverse est calculé avec le nombre de parties gagnées où un pokémon donné apparaît dans l'équipe adverse, divisé par le nombre total de parties jouées où un pokémon donné apparaît dans l'équipe adverse.</p>
     <div class="p-5 grid grid-cols-5 gap-2 justify-items-center border-2">
         <span class="font-bold col-span-5">Taux par pokémon adverse</span>
         {% for stat in per_opponent_winrate%}
@@ -12,4 +14,24 @@
         <span class="font-bold col-span-5">Global : {{ win_percentage|floatformat:1 }}%</span>
     </div>
 
+    <h2>Classement d'équipe</h2>
+    <p>Les valeurs affichées correspondent aux valeurs moyennes sur toutes les parties.</p>
+    <div class="p-5 grid grid-cols-2 gap-2 justify-items-stretch border-2">
+        <span class="font-bold">Joueur</span>
+        <span class="score-grid font-bold">
+            <span>Points</span>
+            <span>Kills</span>
+            <span>Assists</span>
+            <span>Score</span>
+        </span>
+        {% for player in per_ally_averages %}
+        <span>{{ player.pseudo }}</span>
+        <span class="score-grid">
+            <span>{{ player.avg_scored|floatformat:0 }}</span>
+            <span>{{ player.avg_kills|floatformat:0 }}</span>
+            <span>{{ player.avg_assists|floatformat:0 }}</span>
+            <span>{{ player.avg_result|floatformat:0 }}</span>
+        </span>
+    {% endfor %}
+    </div>
 {% endblock %}

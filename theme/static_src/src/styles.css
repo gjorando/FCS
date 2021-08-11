@@ -21,17 +21,17 @@ nav > div > a
 
 main h1
 {
-    @apply font-bold text-5xl mb-3;
+    @apply font-bold text-5xl mb-5;
 }
 
 main h2
 {
-    @apply font-bold text-3xl mb-3;
+    @apply font-bold text-3xl my-2;
 }
 
 main p
 {
-    @apply my-4;
+    @apply my-2;
 }
 
 main a, footer a, .link-like
