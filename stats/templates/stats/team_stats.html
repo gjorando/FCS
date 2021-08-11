@@ -5,10 +5,11 @@
     <h1>{{ page_title }}</h1>
     <h2>Taux de victoires</h2>
     <div class="p-5 grid grid-cols-5 gap-2 justify-items-center border-2">
-        <span class="font-bold col-span-5">Global : {{ win_percentage|floatformat:1 }}%</span>
+        <span class="font-bold col-span-5">Taux par pokémon adverse</span>
         {% for stat in per_opponent_winrate%}
             <span class="{% if forloop.first %}text-green-700{% elif forloop.last %}text-red-700{% endif %}">{{ stat.pokemon|pokemon_display }} : {{ stat.winrate|floatformat:1 }}%</span>
         {% endfor %}
+        <span class="font-bold col-span-5">Global : {{ win_percentage|floatformat:1 }}%</span>
     </div>
 
 {% endblock %}
