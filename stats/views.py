@@ -117,7 +117,7 @@ def team_stats(request):
             ),
             output_field=FloatField()
         )/Cast(Count("pokemon"), FloatField())
-    ).order_by("-winrate")
+    ).order_by("-winrate").exclude(winrate=None)
 
     context = {
         "page_title": "Statistiques d'équipe",
