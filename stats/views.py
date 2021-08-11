@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from .models import Game
+from django.db.models import Count, Avg, Sum, Case, Value, When, FloatField
+from django.db.models.functions import Cast
+from .models import Game, PlayerStat
 from . import utils
 from .forms import GamesListFilterForm
 
@@ -79,8 +81,48 @@ def team_stats(request):
     :param request: Request object.
     """
 
+    topn = 5
+
+    if request.method == "GET":
+        # FIXME implement filtering by season
+        season_filter = None
+    else:
+        season_filter = None
+
+    if season_filter:
+        # FIXME see above
+        pass
+    else:
+        games = Game.objects.all()
+        opponent_stats = PlayerStat.objects.filter(is_opponent=True)
+
+    # Compute winrate
+    winrate = games.aggregate(
+        winrate=Avg(
+            Case(
+                When(is_won=True, then=Value(1)),
+                When(is_won=False, then=Value(0))
+            ),
+            output_field=FloatField()
+        )
+    )["winrate"]
+
+    # Compute win-rate per opponent
+    # 9 parties, 5 gagnées
+    per_opponent_winrate = opponent_stats.values("pokemon") \
+        .annotate(
+        winrate=100*Sum(
+            Case(
+                When(game__is_won=True, then=Value(1))
+            ),
+            output_field=FloatField()
+        )/Cast(Count("pokemon"), FloatField())
+    ).order_by("-winrate")
+
     context = {
-        "page_title": "Statistiques d'équipe"
+        "page_title": "Statistiques d'équipe",
+        "win_percentage": winrate*100,
+        "per_opponent_winrate": per_opponent_winrate,
     }
 
     return render(request, "stats/team_stats.html", context)

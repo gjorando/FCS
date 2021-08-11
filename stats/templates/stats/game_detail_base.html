@@ -1,3 +1,5 @@
+{% load stats_extra %}
+
 <div class="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-400">
 {% for team in game.teams %}
     <div class="p-2 grid grid-cols-2 gap-2 justify-items-stretch">
@@ -9,7 +11,7 @@
             <span>Score</span>
         </span>
     {% for player in team.players %}
-        <span>{{ player.pseudo }} ({{ player.pokemon }})</span>
+        <span>{{ player.pseudo }} ({{ player.pokemon|pokemon_display }})</span>
         <span class="score-grid">
             <span>{{ player.scored }}</span>
             <span>{{ player.kills }}</span>

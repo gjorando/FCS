@@ -1,6 +1,16 @@
 {% extends 'stats/base.html' %}
+{% load stats_extra %}
 
 {% block content %}
-<h1>{{ page_title }}</h1>
-<p>Soon...</p>
+    <h1>{{ page_title }}</h1>
+    <p>Taux de victoires : {{ win_percentage|floatformat:1 }}%</p>
+    <div>
+        <span>Taux de victoires par pokémon opposant</span>
+        {% for stat in per_opponent_winrate %}
+            {% if stat.winrate %}
+                <span>{{ stat.pokemon|pokemon_display }} ({{ stat.winrate|floatformat:1 }}%)</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
 {% endblock %}

@@ -27,7 +27,6 @@ def construct_game_context(game):
         team = teams[1 if stat.is_opponent else 0]
 
         stat_dict = stat.__dict__
-        stat_dict["pokemon"] = stat.get_pokemon_display()
 
         if "players" in team:
             team["players"].append(stat_dict)
