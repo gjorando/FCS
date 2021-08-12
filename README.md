@@ -10,3 +10,4 @@ Utiliser `./manage.py collectstatic/migrate/createsuperuser` et `./manage.py tai
 * https://stackoverflow.com/questions/66971594/auto-create-primary-key-used-when-not-defining-a-primary-key-type-warning-in-dja Django 3.2
 * https://www.tailwindtoolbox.com/components/accordion
 * Implémenter la mise en cache avec Redis
+* Ne pas utiliser de CDN pour ChartJS

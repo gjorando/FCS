@@ -1,0 +1,72 @@
+{% extends 'stats/base.html' %}
+{% load stats_extra %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>{{ page_title }}</h1>
+
+    <h2>Moyennes</h2>
+    <div class="p-5 flex flex-col gap-2 justify-items-stretch border-2">
+        <span class="score-grid font-bold">
+            <span>Points</span>
+            <span>Kills</span>
+            <span>Assists</span>
+            <span>Score</span>
+        </span>
+        <span class="score-grid">
+            <span>{{ averages.avg_scored|floatformat:0 }}</span>
+            <span>{{ averages.avg_kills|floatformat:0 }}</span>
+            <span>{{ averages.avg_assists|floatformat:0 }}</span>
+            <span>{{ averages.avg_result|floatformat:0 }}</span>
+        </span>
+    </div>
+
+    <h2>Évolution des performances</h2>
+    <canvas id="moving-avg"></canvas>
+    <script type="module">
+        {# FIXME make locales work #}
+        {#import * as fr from 'https://cdn.jsdelivr.net/npm/date-fns/locale/+esm';#}
+        let ctx = document.getElementById('moving-avg').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [
+                    {% for name, data in datasets.items %}{
+                        {% autoescape off %}
+                            label: '{{ verbose_names|get_item:name|escapejs }}',
+                        {% endautoescape %}
+                        data: {{ data|safe }},
+                        cubicInterpolationMode: "monotone",
+                        borderColor: [
+                            '{{ color_values|get_item:name }}'
+                        ],
+                    },{% endfor %}
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        },
+                        adapters: {
+                            date: {
+                                {#locale: fr#}
+                            }
+                        },
+                    },
+                    y: {
+                        min: 0
+                    }
+                }
+            }
+        });
+
+    </script>
+{% endblock %}

@@ -1,8 +1,12 @@
+import datetime
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from django.db.models import Count, Avg, Sum, Case, Value, When, FloatField
-from django.db.models.functions import Cast
-from .models import Game, PlayerStat
+from django.db.models import Count, Avg, Sum, Case, Value, When, FloatField, DateField
+from django.db.models.functions import Cast, TruncDate
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+from .models import Game, PlayerStat, Teammate
 from . import utils
 from .forms import GamesListFilterForm
 
@@ -135,3 +139,73 @@ def team_stats(request):
     }
 
     return render(request, "stats/team_stats.html", context)
+
+
+def player_detail(request, pseudo):
+    """
+    Displays a number of stats for the player.
+
+    :param request: Request object.
+    :param pseudo: Player pseudo.
+    """
+
+    # FIXME implement filtering by season (see team_stats)
+    # FIXME implement sliding window
+
+    if len(Teammate.objects.values("pseudo").filter(pseudo=pseudo)) == 0:
+        return HttpResponseRedirect(reverse('games_list'))
+
+    player_stats = PlayerStat.objects.filter(is_opponent=False, pseudo=pseudo)
+
+    averages = player_stats.aggregate(
+        avg_scored=Avg("scored"),
+        avg_kills=Avg("kills"),
+        avg_assists=Avg("assists"),
+        avg_result=Avg("result")
+    )
+
+    avg_names = ("avg_scored", "avg_kills", "avg_assists", "avg_result")
+    verbose_names = {
+        "avg_scored": "Score moyen",
+        "avg_kills": "Nombre moyen de kills",
+        "avg_assists": "Nombre moyen d'assists",
+        "avg_result": "Résultat moyen"
+    }
+    moving_averages = player_stats.annotate(
+        as_date=Cast(TruncDate("game__date"), output_field=DateField())
+    ).values("as_date").annotate(
+        avg_scored=Avg("scored"),
+        avg_kills=Avg("kills"),
+        avg_assists=Avg("assists"),
+        avg_result=Avg("result")
+    ).values("as_date", *avg_names).order_by("as_date")
+
+    labels = []
+    datasets = {}
+    for point in moving_averages:
+        date_label = str(point["as_date"])
+        labels.append(date_label)
+        for value_name in avg_names:
+            if value_name in datasets:
+                datasets[value_name].append(point[value_name])
+            else:
+                datasets[value_name] = [point[value_name]]
+
+    color_values = {
+        "avg_scored": "rgba(255,99,132,1)",
+        "avg_kills": "rgba(54, 162, 235, 1)",
+        "avg_assists": "rgba(255, 206, 86, 1)",
+        "avg_result": "rgba(75, 192, 192, 1)"
+    }
+
+    context = {
+        "page_title": "Statistiques de {}".format(pseudo),
+        "pseudo": pseudo,
+        "averages": averages,
+        "labels": labels,
+        "datasets": datasets,
+        "verbose_names": verbose_names,
+        "color_values": color_values,
+    }
+
+    return render(request, "stats/player_detail.html", context)

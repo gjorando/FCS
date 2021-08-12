@@ -1,5 +1,7 @@
 from django import template
 from django.template.defaultfilters import stringfilter
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
 from ..models import PlayerStat
 
@@ -14,3 +16,12 @@ def pokemon_display(value):
     """
 
     return PlayerStat(pokemon=value).get_pokemon_display()
+
+
+@register.filter(name="get_item", needs_autoescape=True)
+def get_item(dictionary, key, autoescape=True):
+    if autoescape:
+        esc = conditional_escape
+    else:
+        esc = lambda x: x
+    return mark_safe(esc(dictionary.get(key)))

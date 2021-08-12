@@ -16,7 +16,7 @@
                 <span>{{ player.scored }}</span>
                 <span>{{ player.kills }}</span>
                 <span>{{ player.assists }}</span>
-                <span>{{ player.result }}</span>
+                <span class="{{ player.is_mvp|yesno:'game-detail-mvp,' }}">{{ player.result }}</span>
             </span>
         {% endfor %}
     </div>

@@ -6,12 +6,12 @@
 
     <h2>Taux de victoires</h2>
     <p>Le taux de victoires par pokémon adverse est calculé avec le nombre de parties gagnées où un pokémon donné apparaît dans l'équipe adverse, divisé par le nombre total de parties jouées où un pokémon donné apparaît dans l'équipe adverse.</p>
-    <div class="p-5 grid grid-cols-5 gap-2 justify-items-center border-2">
-        <span class="font-bold col-span-5">Taux par pokémon adverse</span>
+    <div class="p-5 flex flex-col gap-2 md:grid md:grid-cols-5 md:justify-items-center border-2">
+        <span class="font-bold md:col-span-5">Taux par pokémon adverse</span>
         {% for stat in per_opponent_winrate%}
             <span class="{% if forloop.first %}text-green-700{% elif forloop.last %}text-red-700{% endif %}">{{ stat.pokemon|pokemon_display }} : {{ stat.winrate|floatformat:1 }}%</span>
         {% endfor %}
-        <span class="font-bold col-span-5">Global : {{ win_percentage|floatformat:1 }}%</span>
+        <span class="font-bold md:col-span-5">Global : {{ win_percentage|floatformat:1 }}%</span>
     </div>
 
     <h2>Classement d'équipe</h2>
@@ -25,13 +25,13 @@
             <span>Score</span>
         </span>
         {% for player in per_ally_averages %}
-        <span>{{ player.pseudo }}</span>
-        <span class="score-grid">
-            <span>{{ player.avg_scored|floatformat:0 }}</span>
-            <span>{{ player.avg_kills|floatformat:0 }}</span>
-            <span>{{ player.avg_assists|floatformat:0 }}</span>
-            <span>{{ player.avg_result|floatformat:0 }}</span>
-        </span>
-    {% endfor %}
+            <span><a href="{% url "player_detail" pseudo=player.pseudo %}">{{ player.pseudo }}</a></span>
+            <span class="score-grid">
+                <span>{{ player.avg_scored|floatformat:0 }}</span>
+                <span>{{ player.avg_kills|floatformat:0 }}</span>
+                <span>{{ player.avg_assists|floatformat:0 }}</span>
+                <span>{{ player.avg_result|floatformat:0 }}</span>
+            </span>
+        {% endfor %}
     </div>
 {% endblock %}

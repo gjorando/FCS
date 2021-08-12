@@ -17,22 +17,40 @@ def construct_game_context(game):
     """
 
     # TODO display MVP
-    player_stats = game.playerstat_set.all().order_by("-scored", "-result", "-pseudo")
+    player_stats = game.playerstat_set.all().order_by("pseudo")
 
     teams = [{}, {}]
 
     teams[0]["score"] = game.score_allies
     teams[1]["score"] = game.score_opponents
+    mvp_vals = [0, 0]
+    mvp_scores = [0, 0]
+    mvp_ids = [-1, -1]
 
+    idx = [0, 0]
     for stat in player_stats:
-        team = teams[1 if stat.is_opponent else 0]
+        team_id = 1 if stat.is_opponent else 0
+        team = teams[team_id]
 
         stat_dict = stat.__dict__
+        stat_dict["is_mvp"] = False
+
+        # MVP is the highest mark, or the highest scored points if there's a draw
+        if stat_dict["result"] > mvp_vals[team_id] \
+           or (stat_dict["result"] == mvp_vals[team_id] and stat_dict["scored"] > mvp_scores[team_id]):
+            mvp_vals[team_id] = stat_dict["result"]
+            mvp_scores[team_id] = stat_dict["scored"]
+            mvp_ids[team_id] = idx[team_id]
 
         if "players" in team:
             team["players"].append(stat_dict)
         else:
             team["players"] = [stat_dict]
+
+        idx[team_id] += 1
+
+    for i, team in enumerate(teams):
+        team["players"][mvp_ids[i]]["is_mvp"] = True
 
     return {
         "teams": teams,

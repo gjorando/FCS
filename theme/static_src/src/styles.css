@@ -39,6 +39,11 @@ main a, footer a, .link-like
     @apply text-blue-800 hover:underline;
 }
 
+pre
+{
+    @apply whitespace-pre-wrap;
+}
+
 /* GAME_DETAIL_BASE SPECIAL RULES*/
 
 .game-detail-ally
@@ -49,6 +54,11 @@ main a, footer a, .link-like
 .game-detail-opponent
 {
     @apply text-red-800;
+}
+
+.game-detail-mvp
+{
+    @apply bg-yellow-400 rounded-md;
 }
 
 @layer components
