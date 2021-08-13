@@ -6,7 +6,7 @@
 
     <h2>Taux de victoires</h2>
     <p>Le taux de victoires par pokémon adverse est calculé avec le nombre de parties gagnées où un pokémon donné apparaît dans l'équipe adverse, divisé par le nombre total de parties jouées où un pokémon donné apparaît dans l'équipe adverse.</p>
-    <div class="p-5 flex flex-col gap-2 md:grid md:grid-cols-5 md:justify-items-center border-2">
+    <div class="p-5 flex flex-col gap- md:grid md:grid-cols-5 md:justify-items-center border-2">
         <span class="font-bold md:col-span-5">Taux par pokémon adverse</span>
         {% for stat in per_opponent_winrate%}
             <span class="text-center {% if forloop.first %}text-green-700{% elif forloop.last %}text-red-700{% endif %}">{{ stat.pokemon|pokemon_display }} : {{ stat.winrate|floatformat:1 }}%<br>({{ stat.num_games }} partie{{ stat.num_games|pluralize }})</span>

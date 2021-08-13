@@ -31,7 +31,7 @@ main h2
 
 main p
 {
-    @apply my-2;
+    @apply my-2 w-full text-justify;
 }
 
 main a, footer a, .link-like
