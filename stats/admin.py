@@ -5,7 +5,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm
-from .models import Game, PlayerStat, Teammate
+from .models import Game, PlayerStat, Teammate, Pokemon
 from .utils import prefill_game
 
 
@@ -46,7 +46,7 @@ class GameAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, *args, **kwargs):
         self.change_form_template = 'stats/admin_game.html'
 
-        print(args, kwargs)
+        # print(args, kwargs)
 
         extra_context = {}
         if "prefilled_img" in request.session and kwargs["add"]:
@@ -94,4 +94,17 @@ class GameAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "stats/admin_prefill.html", context)
 
 
-admin.site.register(Teammate)
+@admin.register(Pokemon)
+class PokemonAdmin(admin.ModelAdmin):
+    ordering = ("category", "name",)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['id']
+        else:
+            return []
+
+
+@admin.register(Teammate)
+class TeammateAdmin(admin.ModelAdmin):
+    ordering = ("pseudo",)

@@ -2,40 +2,6 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 
-LIST_POKEMONS = [
-    ("Attacker", (
-        ("GARDEVOIR", "Gardevoir"),
-        ("PIKACHU", "Pikachu"),
-        ("GRENINJA", "Greninja"),
-        ("VENUSAUR", "Venusaur"),
-        ("A_NINETALES", "Alolan Ninetales"),
-        ("CRAMORANT", "Cramorant"),
-        ("CINDERACE", "Cinderace"),
-    )),
-    ("Speedster", (
-        ("ZERAORA", "Zeraora"),
-        ("TALONFLAME", "Talonflame"),
-        ("ABSOL", "Absol"),
-        ("GENGAR", "Gengar"),
-    )),
-    ("All-rounder", (
-        ("CHARIZARD", "Charizard"),
-        ("LUCARIO", "Lucario"),
-        ("MACHAMP", "Machamp"),
-        ("GARCHOMP", "Garchomp"),
-    )),
-    ("Defender", (
-        ("SNORLAX", "Snorlax"),
-        ("CRUSTLE", "Crustle"),
-        ("SLOWBRO", "Slowbro"),
-    )),
-    ("Supporter", (
-        ("ELDEGOSS", "Eldegoss"),
-        ("MR_MIME", "Mr. Mime"),
-        ("WIGGLYTUFF", "Wigglytuff"),
-    ))
-]
-
 
 class Game(models.Model):
     """
@@ -57,6 +23,24 @@ class Game(models.Model):
             self.date.strftime("%d/%m/%Y à %H:%M"),
             "gagnée" if self.is_won else "perdue"
         )
+
+
+class Pokemon(models.Model):
+    """
+    List of playable pokémons.
+    """
+
+    class Meta:
+        verbose_name = "Pokémon"
+
+    id = models.CharField("ID", max_length=64, primary_key=True)
+    name = models.CharField("Nom", max_length=64)
+    category = models.CharField("Catégorie", max_length=5, choices=[
+        ("A", "Attacker"), ("S", "Speedster"), ("AR", "All-rounder"), ("D", "Defender"), ("S", "Supporter")
+    ])
+
+    def __str__(self):
+        return "{} ({})".format(self.name, self.get_category_display())
 
 
 def restrict_amount(value):
@@ -83,9 +67,9 @@ class PlayerStat(models.Model):
             models.UniqueConstraint(fields=["game", "pokemon", "is_opponent"], name="no_duplicate_pokemons_in_team")
         ]
 
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, validators=[restrict_amount,])
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, validators=[restrict_amount])
     pseudo = models.CharField("Pseudo", max_length=64)
-    pokemon = models.CharField("Pokémon joué", max_length=64, choices=LIST_POKEMONS)
+    pokemon = models.ForeignKey(Pokemon, on_delete=models.PROTECT)
     is_opponent = models.BooleanField("Joueur adverse")
     scored = models.PositiveIntegerField("Points marqués")
     kills = models.PositiveIntegerField("Nombre de KOs")
@@ -96,7 +80,7 @@ class PlayerStat(models.Model):
         return "{}: {}({}) S{}/K{}/A{}/{}".format(
             "Adversaire" if self.is_opponent else "FCS",
             self.pseudo,
-            self.get_pokemon_display(),
+            self.pokemon.name,
             self.scored,
             self.kills,
             self.assists,

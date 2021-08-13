@@ -1,6 +1,7 @@
 import django.core.validators
 from django.db import migrations, models
 
+
 def set_scores(apps, schema_editor):
     """
     Tries to deduce the score of a match based on the individual points scored by each member. As some extra points can
@@ -22,6 +23,7 @@ def set_scores(apps, schema_editor):
         game.score_opponents = score_opponents
         game.save()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -32,13 +34,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='game',
             name='score_allies',
-            field=models.PositiveIntegerField(default=0, validators=[django.core.validators.MinValueValidator(1)], verbose_name='Score allié'),
+            field=models.PositiveIntegerField(default=0, validators=[django.core.validators.MinValueValidator(1)],
+                                              verbose_name='Score allié'),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='game',
             name='score_opponents',
-            field=models.PositiveIntegerField(default=0, validators=[django.core.validators.MinValueValidator(1)], verbose_name='Score opposants'),
+            field=models.PositiveIntegerField(default=0, validators=[django.core.validators.MinValueValidator(1)],
+                                              verbose_name='Score opposants'),
             preserve_default=False,
         ),
         migrations.RunPython(set_scores),

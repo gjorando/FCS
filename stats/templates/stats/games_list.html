@@ -6,7 +6,7 @@
     <div class="font-bold mb-2">Filtres</div>
     <form class="flex flex-col justify-center" action="{% url 'games_list' %}" method="get">
         {{ filter_form }}
-        <input class="w-max mx-auto link-like mt-2" type="submit" value="Appliquer">
+        <input class="w-max mx-auto link-like mt-2 bg-transparent" type="submit" value="Appliquer">
         <a href="{% url 'games_list' %}">Réinitialiser</a>
     </form>
 </div>

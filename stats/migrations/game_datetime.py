@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db import migrations, models
 
+
 def update_time(apps, schema_editor):
     """
     Fills the new_date DateTime field with the date from the old date Date
@@ -12,6 +13,7 @@ def update_time(apps, schema_editor):
     for game in Game.objects.all():
         game.new_date = datetime.combine(game.date, datetime.min.time())
         game.save()
+
 
 class Migration(migrations.Migration):
     initial = True

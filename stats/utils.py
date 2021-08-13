@@ -16,7 +16,6 @@ def construct_game_context(game):
     :return: A dict containing the context needed by the template.
     """
 
-    # TODO display MVP
     player_stats = game.playerstat_set.all().order_by("pseudo")
 
     teams = [{}, {}]
@@ -32,7 +31,9 @@ def construct_game_context(game):
         team_id = 1 if stat.is_opponent else 0
         team = teams[team_id]
 
+        pokemon = stat.pokemon
         stat_dict = stat.__dict__
+        stat_dict["pokemon"] = pokemon
         stat_dict["is_mvp"] = False
 
         # MVP is the highest mark, or the highest scored points if there's a draw
