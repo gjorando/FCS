@@ -111,6 +111,7 @@ def team_stats(request):
             output_field=FloatField()
         )
     )["winrate"]
+    num_games = len(games)
 
     # Compute win-rate per opponent
     # 9 parties, 5 gagnées
@@ -120,7 +121,8 @@ def team_stats(request):
                 When(game__is_won=True, then=Value(1))
             ),
             output_field=FloatField()
-        )/Cast(Count("pokemon"), FloatField())
+        )/Cast(Count("pokemon"), FloatField()),
+        num_games=Count("id")
     ).order_by("-winrate").exclude(winrate=None)
 
     # Compute averages per teammate
@@ -134,6 +136,7 @@ def team_stats(request):
     context = {
         "page_title": "Statistiques d'équipe",
         "win_percentage": winrate*100 if winrate else None,
+        "num_games": num_games,
         "per_opponent_winrate": per_opponent_winrate,
         "per_ally_averages": per_ally_averages,
     }

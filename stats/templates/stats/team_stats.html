@@ -9,9 +9,9 @@
     <div class="p-5 flex flex-col gap-2 md:grid md:grid-cols-5 md:justify-items-center border-2">
         <span class="font-bold md:col-span-5">Taux par pokémon adverse</span>
         {% for stat in per_opponent_winrate%}
-            <span class="{% if forloop.first %}text-green-700{% elif forloop.last %}text-red-700{% endif %}">{{ stat.pokemon|pokemon_display }} : {{ stat.winrate|floatformat:1 }}%</span>
+            <span class="text-center {% if forloop.first %}text-green-700{% elif forloop.last %}text-red-700{% endif %}">{{ stat.pokemon|pokemon_display }} : {{ stat.winrate|floatformat:1 }}%<br>({{ stat.num_games }} partie{{ stat.num_games|pluralize }})</span>
         {% endfor %}
-        <span class="font-bold md:col-span-5">Global : {{ win_percentage|floatformat:1 }}%</span>
+        <span class="text-center font-bold md:col-span-5">Global : {{ win_percentage|floatformat:1 }}%<br>({{ num_games }} partie{{ num_games|pluralize }})</span>
     </div>
 
     <h2>Classement d'équipe</h2>
