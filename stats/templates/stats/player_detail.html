@@ -1,10 +1,4 @@
 {% extends 'stats/base.html' %}
-{% load stats_extra %}
-
-{% block extra_head %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-{% endblock %}
 
 {% block content %}
     <h1>{{ page_title }}</h1>
@@ -26,47 +20,5 @@
     </div>
 
     <h2>Évolution des performances</h2>
-    <canvas id="moving-avg"></canvas>
-    <script type="module">
-        {# FIXME make locales work #}
-        {#import * as fr from 'https://cdn.jsdelivr.net/npm/date-fns/locale/+esm';#}
-        let ctx = document.getElementById('moving-avg').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ labels|safe }},
-                datasets: [
-                    {% for name, data in datasets.items %}{
-                        {% autoescape off %}
-                            label: '{{ verbose_names|get_item:name|escapejs }}',
-                        {% endautoescape %}
-                        data: {{ data|safe }},
-                        cubicInterpolationMode: "monotone",
-                        borderColor: [
-                            '{{ color_values|get_item:name }}'
-                        ],
-                    },{% endfor %}
-                ]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day'
-                        },
-                        adapters: {
-                            date: {
-                                {#locale: fr#}
-                            }
-                        },
-                    },
-                    y: {
-                        min: 0
-                    }
-                }
-            }
-        });
-
-    </script>
+    {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
 {% endblock %}

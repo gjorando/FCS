@@ -1,0 +1,51 @@
+{# dataset, labels, color_values, canvas_id #}
+{% load stats_extra %}
+
+{# FIXME #}
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+{% endblock %}
+
+<canvas id="{{ canvas_id }}"></canvas>
+<script type="module">
+    {# FIXME make locales work #}
+    {#import * as fr from 'https://cdn.jsdelivr.net/npm/date-fns/locale/+esm';#}
+    let ctx = document.getElementById('{{ canvas_id }}').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [
+                {% for name, data in datasets.items %}{
+                    {% autoescape off %}
+                        label: '{{ verbose_names|get_item:name|escapejs }}',
+                    {% endautoescape %}
+                    data: {{ data|safe }},
+                    cubicInterpolationMode: "monotone",
+                    borderColor: [
+                        '{{ color_values|get_item:name }}'
+                    ],
+                },{% endfor %}
+            ]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    },
+                    adapters: {
+                        date: {
+                            {#locale: fr#}
+                        }
+                    },
+                },
+                y: {
+                    min: 0
+                }
+            }
+        }
+    });
+</script>
