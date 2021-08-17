@@ -133,12 +133,55 @@ def team_stats(request):
         avg_result=Avg("result")
     ).order_by("-avg_result", "-avg_scored")
 
+    # TODO refactoring
+
+    avg_names = ("avg_scored", "avg_kills", "avg_assists", "avg_result")
+    verbose_names = {
+        "avg_scored": "Score moyen",
+        "avg_kills": "Nombre moyen de kills",
+        "avg_assists": "Nombre moyen d'assists",
+        "avg_result": "Résultat moyen"
+    }
+
+    moving_averages = ally_stats.annotate(
+        as_date=Cast(TruncDate("game__date"), output_field=DateField())
+    ).values("as_date").annotate(
+        avg_scored=Avg("scored"),
+        avg_kills=Avg("kills"),
+        avg_assists=Avg("assists"),
+        avg_result=Avg("result")
+    ).values("as_date", *avg_names).order_by("as_date")
+
+    labels = []
+    datasets = {}
+    for point in moving_averages:
+        date_label = str(point["as_date"])
+        labels.append(date_label)
+        for value_name in avg_names:
+            if value_name in datasets:
+                datasets[value_name].append(point[value_name])
+            else:
+                datasets[value_name] = [point[value_name]]
+
+    color_values = {
+        "avg_scored": "rgba(255,99,132,1)",
+        "avg_kills": "rgba(54, 162, 235, 1)",
+        "avg_assists": "rgba(255, 206, 86, 1)",
+        "avg_result": "rgba(75, 192, 192, 1)"
+    }
+
+    # END TODO
+
     context = {
         "page_title": "Statistiques d'équipe",
         "win_percentage": winrate*100 if winrate else None,
         "num_games": num_games,
         "per_opponent_winrate": per_opponent_winrate,
         "per_ally_averages": per_ally_averages,
+        "labels": labels,
+        "datasets": datasets,
+        "verbose_names": verbose_names,
+        "color_values": color_values,
     }
 
     return render(request, "stats/team_stats.html", context)
