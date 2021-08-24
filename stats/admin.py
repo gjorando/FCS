@@ -4,7 +4,7 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm
+from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm, PokemonChoiceField
 from .models import Game, PlayerStat, Teammate, Pokemon
 from .utils import prefill_game
 
@@ -21,6 +21,11 @@ class PlayerInline(admin.TabularInline):
     max_num = 10
     min_num = 10
     can_delete = False
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "pokemon":
+            return PokemonChoiceField(queryset=Pokemon.objects.all())
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Game)
@@ -62,9 +67,11 @@ class GameAdmin(admin.ModelAdmin):
         # FIXME understand how to set the initial values
         #print(form().as_p())
         if not change:
-            print("NEW")
+            pass
+            #print("NEW")
         else:
-            print("UPDATE")
+            pass
+            #print("UPDATE")
 
         return form
 

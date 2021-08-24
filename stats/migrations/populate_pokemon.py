@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from django.db import migrations, models
+from django.db import migrations
 
 LIST_POKEMONS = [
     ("A", (
@@ -37,10 +35,9 @@ LIST_POKEMONS = [
 ]
 
 
-def update_time(apps, schema_editor):
+def populate_pokemon(apps, schema_editor):
     """
-    Fills the new_date DateTime field with the date from the old date Date
-    field.
+    Populate with the existing pokémons.
     """
 
     Pokemon = apps.get_model("stats", "Pokemon")
@@ -61,5 +58,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_time)
+        migrations.RunPython(populate_pokemon)
     ]

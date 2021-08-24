@@ -6,6 +6,34 @@ DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
 DEFAULT_POKEMONS = ["ZERAORA", "LUCARIO", "PIKACHU", "CRAMORANT", "SNORLAX"]
 
 
+class PokemonChoiceIterator(forms.models.ModelChoiceIterator):
+    def __iter__(self):
+        groups = {}
+        for item in super().__iter__():
+            if isinstance(item[0], forms.models.ModelChoiceIteratorValue):
+                category = item[0].instance.get_category_display()
+                if category in groups:
+                    groups[category].append(item[0].instance)
+                else:
+                    groups[category] = [item[0].instance]
+            else:
+                yield item
+
+        for group, objs in sorted(groups.items(), key=lambda x: x[0]):
+            objs = sorted(objs, key=lambda x: x.name)
+            yield group, [self.choice(obj) for obj in objs]
+
+
+class PokemonChoiceField(forms.ModelChoiceField):
+    def __init__(self, *args, **kwargs):
+        self.iterator = PokemonChoiceIterator
+
+        super().__init__(*args, **kwargs)
+
+    def label_from_instance(self, obj):
+        return obj.name
+
+
 class GamesListFilterForm(forms.Form):
     per_page = forms.IntegerField(label="Éléments par page", label_suffix="", min_value=1, initial=10, required=False)
     season = forms.IntegerField(label="Saison", label_suffix="", min_value=1, initial=None, required=False)

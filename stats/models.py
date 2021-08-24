@@ -36,7 +36,7 @@ class Pokemon(models.Model):
     id = models.CharField("ID", max_length=64, primary_key=True)
     name = models.CharField("Nom", max_length=64)
     category = models.CharField("Catégorie", max_length=5, choices=[
-        ("A", "Attacker"), ("S", "Speedster"), ("AR", "All-rounder"), ("D", "Defender"), ("S", "Supporter")
+        ("AR", "All-rounder"), ("A", "Attacker"), ("D", "Defender"), ("SS", "Speedster"), ("S", "Supporter")
     ])
 
     def __str__(self):
