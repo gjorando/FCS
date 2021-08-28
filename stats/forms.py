@@ -2,9 +2,6 @@ from django import forms
 
 from stats.models import PlayerStat, Game
 
-DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
-DEFAULT_POKEMONS = ["ZERAORA", "LUCARIO", "PIKACHU", "CRAMORANT", "SNORLAX"]
-
 
 class PokemonChoiceIterator(forms.models.ModelChoiceIterator):
     def __iter__(self):
@@ -74,25 +71,6 @@ class PlayerInlineAdminForm(forms.ModelForm):
         except ValueError:
             player_id = -1  # Other entries (which are skipped and not shown)
 
-        if (not ("instance" in kwargs and kwargs["instance"])) and ("initial" not in kwargs):
-            initial_values = {
-                "scored": 0,
-                "kills": 0,
-                "assists": 0,
-                "result": 10
-            }
-
-            if player_id < 0:  # We skip these entries
-                pass
-            elif player_id < 5:  # The 5 first entries are the ally team
-                # Pre-set the names of each player as well as their default Pokémon
-                initial_values["pseudo"] = DEFAULT_PLAYERS[player_id]
-                initial_values["pokemon"] = DEFAULT_POKEMONS[player_id]
-            else:  # The 5 last are the opposing team
-                initial_values["is_opponent"] = True
-
-            kwargs["initial"] = initial_values
-
         super(PlayerInlineAdminForm, self).__init__(*args, **kwargs)
 
         if player_id < 0:
@@ -100,10 +78,8 @@ class PlayerInlineAdminForm(forms.ModelForm):
 
         instance = getattr(self, 'instance', None)
         if instance:
-            # Cannot change the is_opponent field as well as the ally pseudos
+            # Cannot change the is_opponent field
             self.fields["is_opponent"].disabled = True
-            if player_id < 5:
-                self.fields["pseudo"].disabled = True
 
 
 class PrefillForm(forms.Form):

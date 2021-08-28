@@ -4,6 +4,7 @@
 {% block form_top %}
 <p><a href="{% url opts|admin_urlname:'prefill' %}">Pré-remplissage de partie</a></p>
 {% if img %}
-    <img src="data:image/png;base64,{{ img }}" alt="img">
+    <img src="data:image/png;base64,{{ img.1 }}" alt="img">
+    <p><a href="{% url opts|admin_urlname:'prefill' %}?del">Supprimer l'image du cache</a></p>
 {% endif %}
 {% endblock %}
