@@ -12,3 +12,4 @@ Utiliser `./manage.py collectstatic/migrate/createsuperuser` et `./manage.py tai
 * https://www.tailwindtoolbox.com/components/accordion
 * Implémenter la mise en cache avec Redis
 * Ne pas utiliser de CDN pour ChartJS
+* Migrer le Dockerfile pour que le code applicatif soit dans le conteneur, et non un bind mount.
