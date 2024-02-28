@@ -94,6 +94,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Tailwind CSS
 # https://django-tailwind.readthedocs.io/en/latest/installation.html
+# python manage.py tailwind start
 
 TAILWIND_APP_NAME = 'theme'
 

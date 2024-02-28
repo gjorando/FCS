@@ -20,7 +20,7 @@
             <li class="text-center font-bold border-t-2">{{ game.date|date:"j F Y" }}</li>
         {% endifchanged %}
         <li>
-            <a class="text-2xl font-bold" title="{{ game.date }}" href="{% url 'game_detail' game_id=game.pk %}">{{ game.teams.0.score }} - {{ game.teams.1.score }} ({{ game.is_won|yesno:"victoire,défaite" }})</a>
+            <a class="text-2xl font-bold" title="{{ game.date }}" href="{% url 'game_detail' game_id=game.pk %}">{{ game.teams.0.score }} - {{ game.teams.1.score }} ({{ game.is_won|yesno:"victoire,défaite" }}{{ game.is_forfeit|yesno:" par forfait," }})</a>
             {% include 'stats/game_detail_base.html' %}
         </li>
     {% endfor %}

@@ -56,6 +56,7 @@ def construct_game_context(game):
         "teams": teams,
         "pk": game.pk,
         "is_won": game.is_won,
+        "is_forfeit": game.is_forfeit,
         "date": game.date,
     }
 

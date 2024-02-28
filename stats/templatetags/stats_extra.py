@@ -22,6 +22,9 @@ def pokemon_display(value):
 
 @register.filter(name="get_item", needs_autoescape=True)
 def get_item(dictionary, key, autoescape=True):
+    """
+    Retrieve an item from a dictionary.
+    """
     if autoescape:
         esc = conditional_escape
     else:

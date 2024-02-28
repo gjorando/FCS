@@ -15,6 +15,7 @@ class Game(models.Model):
     date = models.DateTimeField("Date du match")
     season = models.PositiveIntegerField("Saison", validators=[MinValueValidator(1)])
     is_won = models.BooleanField("Partie gagnée", default=False)
+    is_forfeit = models.BooleanField("Forfait", default=False)
     score_allies = models.PositiveIntegerField("Score allié")
     score_opponents = models.PositiveIntegerField("Score opposants")
 
@@ -49,6 +50,7 @@ def restrict_amount(value):
 
     :param value: Game id.
     """
+
     # FIXME count exactly 5 players per team instead of maximum number for whole game
     # Maybe use a constraint instead?
     if PlayerStat.objects.filter(game=value).count() >= 10:
