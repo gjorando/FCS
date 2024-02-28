@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tailwind',
     'theme',
-    'stats.apps.StatsConfig'
+    'stats.apps.StatsConfig',
+    'django_browser_reload'
 ]
 
 MIDDLEWARE = [
@@ -35,6 +36,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_browser_reload.middleware.BrowserReloadMiddleware'
 ]
 
 ROOT_URLCONF = 'fcs.urls'
@@ -94,6 +96,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://django-tailwind.readthedocs.io/en/latest/installation.html
 
 TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # Custom settings
 from .settings_production import *
