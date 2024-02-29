@@ -3,6 +3,22 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 
 
+class Season(models.Model):
+    """
+    Define a season that is recorded in database.
+    """
+
+    class Meta:
+        verbose_name = "Saison"
+        get_latest_by = "number"
+
+    number = models.PositiveIntegerField("Numéro de saison", validators=[MinValueValidator(1)],
+                                         primary_key=True)
+
+    def __str__(self):
+        return f"Saison {self.number}"
+
+
 class Game(models.Model):
     """
     Stores the results of a game as well as the individual results of each
@@ -11,9 +27,10 @@ class Game(models.Model):
 
     class Meta:
         verbose_name = "Partie"
+        get_latest_by = "date"
 
     date = models.DateTimeField("Date du match")
-    season = models.PositiveIntegerField("Saison", validators=[MinValueValidator(1)])
+    season = models.ForeignKey(Season, on_delete=models.PROTECT)
     is_won = models.BooleanField("Partie gagnée", default=False)
     is_forfeit = models.BooleanField("Forfait", default=False)
     score_allies = models.PositiveIntegerField("Score allié")

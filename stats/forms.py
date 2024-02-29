@@ -1,11 +1,15 @@
 from django import forms
 
-from stats.models import PlayerStat, Game
+from stats.models import PlayerStat, Game, Season
 
 
 class PokemonChoiceIterator(forms.models.ModelChoiceIterator):
+    """
+    The choice iterator for PokemonChoiceField that actually orders them by category.
+    """
+
     def __iter__(self):
-        groups = {}
+        groups = {}  # We fully iterate our raw list of Pokémon to create categories
         for item in super().__iter__():
             if isinstance(item[0], forms.models.ModelChoiceIteratorValue):
                 category = item[0].instance.get_category_display()
@@ -16,12 +20,17 @@ class PokemonChoiceIterator(forms.models.ModelChoiceIterator):
             else:
                 yield item
 
+        # Then we yield each group, sorted by name
         for group, objs in sorted(groups.items(), key=lambda x: x[0]):
             objs = sorted(objs, key=lambda x: x.name)
             yield group, [self.choice(obj) for obj in objs]
 
 
 class PokemonChoiceField(forms.ModelChoiceField):
+    """
+    A custom choice field that orders Pokémon by category.
+    """
+
     def __init__(self, *args, **kwargs):
         self.iterator = PokemonChoiceIterator
 
@@ -32,6 +41,10 @@ class PokemonChoiceField(forms.ModelChoiceField):
 
 
 class GamesListFilterForm(forms.Form):
+    """
+    Form for the games list page.
+    """
+
     per_page = forms.IntegerField(label="Éléments par page", label_suffix="", min_value=1, initial=10, required=False)
     season = forms.IntegerField(label="Saison", label_suffix="", min_value=1, initial=None, required=False)
 
@@ -42,6 +55,17 @@ class GamesListFilterForm(forms.Form):
         return self.cleaned_data["season"] or None
 
 
+def formfield_for_game_model(db_field, **kwargs):
+    """
+    Customize some fields of the Game admin form.
+    """
+
+    # Seasons
+    if db_field.name == "season":
+        return forms.ModelChoiceField(queryset=Season.objects.all())
+    return db_field.formfield(**kwargs)
+
+
 class GameAdminForm(forms.ModelForm):
     """
     Custom model form for the games.
@@ -50,6 +74,7 @@ class GameAdminForm(forms.ModelForm):
     class Meta:
         model = Game
         exclude = tuple()
+        formfield_callback = formfield_for_game_model
 
 
 class PlayerInlineAdminForm(forms.ModelForm):
@@ -83,4 +108,8 @@ class PlayerInlineAdminForm(forms.ModelForm):
 
 
 class PrefillForm(forms.Form):
+    """
+    Form for the prefill admin view.
+    """
+
     picture = forms.FileField(label="Écran de résultat")
