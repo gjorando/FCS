@@ -13,3 +13,5 @@ Utiliser `./manage.py collectstatic/migrate/createsuperuser` et `./manage.py tai
 * Implémenter la mise en cache avec Redis
 * Ne pas utiliser de CDN pour ChartJS
 * Migrer le Dockerfile pour que le code applicatif soit dans le conteneur, et non un bind mount.
+* Documentation
+* Refactoriser (code plus compliant avec la dernière version de Django)
