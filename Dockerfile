@@ -2,17 +2,17 @@ FROM python:3.12.2
 
 # Gunicorn and Django
 
-RUN pip install gunicorn django
+RUN pip install gunicorn json-logging django 'django-tailwind[reload]'
 
 COPY docker/logging.conf /logging.conf
 COPY docker/gunicorn.conf /gunicorn.conf
 
 EXPOSE 3001
 WORKDIR /app/
-VOLUME /app/
-ARG APP_ENTRYPOINT
+VOLUME /app/media/
+VOLUME /app/static/
 
-ENTRYPOINT /usr/local/bin/gunicorn --config /gunicorn.conf --log-config /logging.conf -b :3001 $APP_ENTRYPOINT
+ENTRYPOINT /usr/local/bin/gunicorn --config /gunicorn.conf --log-config /logging.conf -b :3001 fcs.wsgi
 
 # FCS
 
@@ -24,5 +24,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
   && apt-get clean
 
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
+ADD . /app/
+RUN pip install -r /app/requirements.txt
+RUN cd /app && python manage.py tailwind install
+
