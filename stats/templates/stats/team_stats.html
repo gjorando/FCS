@@ -2,8 +2,18 @@
 {% load stats_extra %}
 
 {% block content %}
-    <h1>{{ page_title }}</h1>
-
+<h1>{{ page_title }}</h1>
+<div class="p-4 text-center 2xl:absolute 2xl:top-0 2xl:left-0">
+    <div class="font-bold mb-2">Filtres</div>
+    <form class="flex flex-col justify-center" action="{% url 'team_stats' %}" method="get">
+        {{ filter_form }}
+        <input class="w-max mx-auto link-like mt-2 bg-transparent" type="submit" value="Appliquer">
+        <a href="{% url 'team_stats' %}">Réinitialiser</a>
+    </form>
+</div>
+{% if num_games == 0 %}
+    <p class="text-center">Aucune partie enregistrée présentement.</p>
+{% else %}
     <h2>Taux de victoires</h2>
     <p>Le taux de victoires par pokémon adverse est calculé avec le nombre de parties gagnées où un pokémon donné apparaît dans l'équipe adverse, divisé par le nombre total de parties jouées où un pokémon donné apparaît dans l'équipe adverse.</p>
     <div class="p-5 flex flex-col gap- md:grid md:grid-cols-5 md:justify-items-center border-2">
@@ -25,7 +35,7 @@
             <span>Score</span>
         </span>
         {% for player in per_ally_averages %}
-            <span><a href="{% url "player_detail" pseudo=player.pseudo %}">{{ player.pseudo }}</a></span>
+            <span><a href="{% url "player_detail" pseudo=player.pseudo %}{{ url_get_encode|yesno:"?," }}{{ url_get_encode }}">{{ player.pseudo }}</a></span>
             <span class="score-grid">
                 <span>{{ player.avg_scored|floatformat:0 }}</span>
                 <span>{{ player.avg_kills|floatformat:0 }}</span>
@@ -37,4 +47,5 @@
 
     <h2>Évolution des performances</h2>
     {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+{% endif %}
 {% endblock %}

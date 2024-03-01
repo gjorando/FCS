@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from .models import Game, PlayerStat, Teammate
 from . import utils
-from .forms import GamesListFilterForm
+from .forms import GamesListFilterForm, TeamStatFilterForm
 
 
 def games_list(request):
@@ -85,17 +85,23 @@ def team_stats(request):
     :param request: Request object.
     """
 
-    topn = 5
-
     if request.method == "GET":
-        # FIXME implement filtering by season
-        season_filter = None
+        filter_form = TeamStatFilterForm(request.GET)
+        filter_form.is_valid()
+        season_filter = filter_form.cleaned_data.get("season") or None
     else:
         season_filter = None
 
+    url_get_encode = request.GET.urlencode()
+
+    filter_form = TeamStatFilterForm(initial={
+        "season": season_filter
+    })
+
     if season_filter:
-        # FIXME see above
-        pass
+        games = Game.objects.filter(season=season_filter)
+        opponent_stats = PlayerStat.objects.filter(game_id__in=games.values('id'), is_opponent=True)
+        ally_stats = PlayerStat.objects.filter(game_id__in=games.values('id'), is_opponent=False)
     else:
         games = Game.objects.all()
         opponent_stats = PlayerStat.objects.filter(is_opponent=True)
@@ -114,7 +120,6 @@ def team_stats(request):
     num_games = len(games)
 
     # Compute win-rate per opponent
-    # 9 parties, 5 gagnées
     per_opponent_winrate = opponent_stats.values("pokemon").annotate(
         winrate=100*Sum(
             Case(
@@ -133,6 +138,7 @@ def team_stats(request):
         avg_result=Avg("result")
     ).order_by("-avg_result", "-avg_scored")
 
+    # FIXME si un Pokémon n'a été rencontré dans aucun match gagné, il n'apparaît pas dans le taux par adversaire
     # TODO refactoring
 
     avg_names = ("avg_scored", "avg_kills", "avg_assists", "avg_result")
@@ -182,6 +188,8 @@ def team_stats(request):
         "datasets": datasets,
         "verbose_names": verbose_names,
         "color_values": color_values,
+        "url_get_encode": url_get_encode,
+        "filter_form": filter_form,
     }
 
     return render(request, "stats/team_stats.html", context)
@@ -195,13 +203,39 @@ def player_detail(request, pseudo):
     :param pseudo: Player pseudo.
     """
 
-    # FIXME implement filtering by season (see team_stats)
     # FIXME implement sliding window
+    # FIXME see if possible to use a proper tag for GET parameters in templates
 
     if len(Teammate.objects.values("pseudo").filter(pseudo=pseudo)) == 0:
         return HttpResponseRedirect(reverse('games_list'))
 
-    player_stats = PlayerStat.objects.filter(is_opponent=False, pseudo=pseudo)
+    if request.method == "GET":
+        filter_form = TeamStatFilterForm(request.GET)
+        filter_form.is_valid()
+        season_filter = filter_form.cleaned_data.get("season") or None
+    else:
+        season_filter = None
+
+    filter_form = TeamStatFilterForm(initial={
+        "season": season_filter
+    })
+
+    if season_filter:
+        player_stats = PlayerStat.objects.filter(game__season=season_filter, is_opponent=False, pseudo=pseudo)
+    else:
+        player_stats = PlayerStat.objects.filter(is_opponent=False, pseudo=pseudo)
+
+    num_games = len(player_stats)
+
+    winrate = player_stats.aggregate(
+        winrate=Avg(
+            Case(
+                When(game__is_won=True, then=Value(1)),
+                When(game__is_won=False, then=Value(0))
+            ),
+            output_field=FloatField()
+        )
+    )["winrate"]
 
     averages = player_stats.aggregate(
         avg_scored=Avg("scored"),
@@ -247,11 +281,14 @@ def player_detail(request, pseudo):
     context = {
         "page_title": "Statistiques de {}".format(pseudo),
         "pseudo": pseudo,
+        "num_games": num_games,
+        "win_percentage": winrate * 100 if winrate else None,
         "averages": averages,
         "labels": labels,
         "datasets": datasets,
         "verbose_names": verbose_names,
         "color_values": color_values,
+        "filter_form": filter_form,
     }
 
     return render(request, "stats/player_detail.html", context)

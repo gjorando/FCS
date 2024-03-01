@@ -73,6 +73,18 @@ class GamesListFilterForm(forms.Form):
         return self.cleaned_data["season"] or None
 
 
+class TeamStatFilterForm(forms.Form):
+    """
+    Form for the team statistics page.
+    """
+
+    season = DBFieldModelChoiceField(queryset=Season.objects.all(), label="Saison", display_field="number",
+                                     label_suffix="", initial=None, required=False)
+
+    def clean_season(self):
+        return self.cleaned_data["season"] or None
+
+
 class GameAdminForm(forms.ModelForm):
     """
     Custom model form for the games.

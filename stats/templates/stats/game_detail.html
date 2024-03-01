@@ -2,6 +2,6 @@
 
 {% block content %}
 <h1>{{ game.teams.0.score }} - {{ game.teams.1.score }} ({{ game.is_won|yesno:"victoire,défaite" }}{{ game.is_forfeit|yesno:" par forfait," }})</h1>
-<h2>{{ game.date }}</h2>
+<h2>Saison {{ game.season_id }} &#x2014; {{ game.date }}</h2>
 {% include 'stats/game_detail_base.html' %}
 {% endblock %}

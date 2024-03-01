@@ -2,24 +2,36 @@
 
 {% block content %}
     <h1>{{ page_title }}</h1>
-
-    <h2>Moyennes</h2>
-    <div class="p-5 flex flex-col gap-2 justify-items-stretch border-2">
-        <span class="score-grid font-bold">
-            <span>Points</span>
-            <span>Kills</span>
-            <span>Assists</span>
-            <span>Score</span>
-        </span>
-        <span class="score-grid">
-            <span>{{ averages.avg_scored|floatformat:0 }}</span>
-            <span>{{ averages.avg_kills|floatformat:0 }}</span>
-            <span>{{ averages.avg_assists|floatformat:0 }}</span>
-            <span>{{ averages.avg_result|floatformat:0 }}</span>
-        </span>
+    <div class="p-4 text-center 2xl:absolute 2xl:top-0 2xl:left-0">
+        <div class="font-bold mb-2">Filtres</div>
+        <form class="flex flex-col justify-center" action="{% url 'player_detail' pseudo %}" method="get">
+            {{ filter_form }}
+            <input class="w-max mx-auto link-like mt-2 bg-transparent" type="submit" value="Appliquer">
+            <a href="{% url 'player_detail' pseudo %}">Réinitialiser</a>
+        </form>
     </div>
-
-    <h2>Évolution des performances</h2>
-    <p>Ces valeurs indiquent le score quotidien moyenné sur tous les joueurs de l'équipe.</p>
-    {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+    {% if num_games == 0 %}
+        <p class="text-center">Aucune partie enregistrée présentement.</p>
+    {% else %}
+        <h2>Moyennes</h2>
+        <div class="p-5 flex flex-col gap-2 justify-items-stretch border-2">
+            <span class="score-grid font-bold">
+                <span>Points</span>
+                <span>Kills</span>
+                <span>Assists</span>
+                <span>Score</span>
+            </span>
+            <span class="score-grid">
+                <span>{{ averages.avg_scored|floatformat:0 }}</span>
+                <span>{{ averages.avg_kills|floatformat:0 }}</span>
+                <span>{{ averages.avg_assists|floatformat:0 }}</span>
+                <span>{{ averages.avg_result|floatformat:0 }}</span>
+            </span>
+            <span class="text-center font-bold md:col-span-5">Global : {{ win_percentage|floatformat:1 }}%<br>({{ num_games }} partie{{ num_games|pluralize }})</span>
+        </div>
+        <h2>Évolution des performances</h2>
+        <p>Ces valeurs indiquent le score quotidien moyenné sur tous les joueurs de l'équipe.</p>
+        {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+    {% endif %}
+    <p></p>
 {% endblock %}

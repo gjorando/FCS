@@ -12,10 +12,13 @@
 </div>
 
 {% if games|length_is:"0" %}
-    <p>Aucune partie enregistrée présentement.</p>
+    <p class="text-center">Aucune partie enregistrée présentement.</p>
 {% else %}
     <ul class="space-y-4">
     {% for game in games %}
+        {% ifchanged %}
+            <li class="text-center font-bold border-t-2 border-b-2 p-4 text-2xl">Saison {{ game.season_id }}</li>
+        {% endifchanged %}
         {% ifchanged %}
             <li class="text-center font-bold border-t-2">{{ game.date|date:"j F Y" }}</li>
         {% endifchanged %}
