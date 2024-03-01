@@ -40,30 +40,37 @@ class PokemonChoiceField(forms.ModelChoiceField):
         return obj.name
 
 
+class DBFieldModelChoiceField(forms.ModelChoiceField):
+    """
+    Custom ModelChoiceField that implements a display_field parameter to display each choice as a single field value.
+    """
+
+    def __init__(self, display_field=None, **kwargs):
+        if display_field:  # FIXME check that it exists in the database
+            self.display_field = display_field
+        else:
+            raise ValueError("Please pick a specific field")
+
+        super().__init__(**kwargs)
+
+    def label_from_instance(self, obj):
+        return obj.__dict__[self.display_field]
+
+
 class GamesListFilterForm(forms.Form):
     """
     Form for the games list page.
     """
 
     per_page = forms.IntegerField(label="Éléments par page", label_suffix="", min_value=1, initial=10, required=False)
-    season = forms.IntegerField(label="Saison", label_suffix="", min_value=1, initial=None, required=False)
+    season = DBFieldModelChoiceField(queryset=Season.objects.all(), label="Saison", display_field="number",
+                                     label_suffix="", initial=None, required=False)
 
     def clean_per_page(self):
         return self.cleaned_data["per_page"] or 10
 
     def clean_season(self):
         return self.cleaned_data["season"] or None
-
-
-def formfield_for_game_model(db_field, **kwargs):
-    """
-    Customize some fields of the Game admin form.
-    """
-
-    # Seasons
-    if db_field.name == "season":
-        return forms.ModelChoiceField(queryset=Season.objects.all())
-    return db_field.formfield(**kwargs)
 
 
 class GameAdminForm(forms.ModelForm):
@@ -74,7 +81,6 @@ class GameAdminForm(forms.ModelForm):
     class Meta:
         model = Game
         exclude = tuple()
-        formfield_callback = formfield_for_game_model
 
 
 class PlayerInlineAdminForm(forms.ModelForm):

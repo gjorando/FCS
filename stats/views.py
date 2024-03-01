@@ -45,14 +45,14 @@ def games_list(request):
         games = Game.objects.all().order_by("-date")
 
     paginator = Paginator(games, items_per_page)
-    games = paginator.get_page(page_number)
+    games_paginated = paginator.get_page(page_number)
 
-    games_info = [utils.construct_game_context(game) for game in games]
+    games_info = [utils.construct_game_context(game) for game in games_paginated]
 
     context = {
         "page_title": "Parties jouées",
         "games": games_info,
-        "page_obj": games,
+        "page_obj": games_paginated,  # This is needed for the paginator
         "url_get_encode": url_get_encode,
         "filter_form": filter_form,
     }

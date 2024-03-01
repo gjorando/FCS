@@ -9,13 +9,14 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageOps
 
 def construct_game_context(game):
     """
-    Create a context item to be interpreted by game_detail_base.html.
+    Create a context item to be interpreted by game_detail_base.html. It adds data for each team in the 'teams' key, the
+    game's primary key in 'pk', as well as all the other Game fields.
 
     :param game: A Game object.
     :return: A dict containing the context needed by the template.
     """
 
-    player_stats = game.playerstat_set.all().order_by("pseudo")
+    player_stats = game.playerstat_set.all().order_by("pseudo")  # Retrieve each player stat
 
     teams = [{}, {}]
 
@@ -30,9 +31,8 @@ def construct_game_context(game):
         team_id = 1 if stat.is_opponent else 0
         team = teams[team_id]
 
-        pokemon = stat.pokemon
-        stat_dict = stat.__dict__
-        stat_dict["pokemon"] = pokemon
+        stat_dict = {k: v for k, v in stat.__dict__.items() if not k.startswith("_")}
+        stat_dict["pokemon"] = stat.pokemon
         stat_dict["is_mvp"] = False
 
         # MVP is the highest mark, or the highest scored points if there's a draw
@@ -55,9 +55,8 @@ def construct_game_context(game):
     return {
         "teams": teams,
         "pk": game.pk,
-        "is_won": game.is_won,
-        "is_forfeit": game.is_forfeit,
-        "date": game.date,
+    } | {
+        k: v for k, v in game.__dict__.items() if not k.startswith("_")
     }
 
 

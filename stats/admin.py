@@ -7,7 +7,7 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm, PokemonChoiceField
+from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm, PokemonChoiceField, DBFieldModelChoiceField
 from .models import Game, PlayerStat, Teammate, Pokemon, Season
 from .utils import prefill_game
 
@@ -106,6 +106,15 @@ class GameAdmin(admin.ModelAdmin):
     list_filter = ["season", "is_won"]
     list_display = ["date", "is_won", "score_allies", "score_opponents"]
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """
+        Use a choice field for every available Pokémon, sorted by category.
+        """
+
+        if db_field.name == "season":
+            return DBFieldModelChoiceField(queryset=Season.objects.all().order_by("-number"), display_field="number")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def get_urls(self):
         """
         Add a custom URL for game prefill in the list of available paths.
@@ -138,7 +147,6 @@ class GameAdmin(admin.ModelAdmin):
 
         initial = super(GameAdmin, self).get_changeform_initial_data(request)
 
-        # TODO use a table of defaults instead
         initial["season"] = Season.objects.latest()
 
         if "prefilled_img" in request.session:
