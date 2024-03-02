@@ -46,6 +46,10 @@
     </div>
 
     <h2>Évolution des performances</h2>
-    {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+    {% if chart_type == "date" %}
+        {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+    {% else %}
+        {% include "stats/integer_chart.html" with canvas_id="moving-avg" %}
+    {% endif %}
 {% endif %}
 {% endblock %}

@@ -1,7 +1,6 @@
-import datetime
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from django.db.models import Count, Avg, Sum, Case, Value, When, FloatField, DateField
+from django.db.models import Count, Avg, Sum, Case, Value, When, FloatField, DateField, IntegerField
 from django.db.models.functions import Cast, TruncDate
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -102,10 +101,14 @@ def team_stats(request):
         games = Game.objects.filter(season=season_filter)
         opponent_stats = PlayerStat.objects.filter(game_id__in=games.values('id'), is_opponent=True)
         ally_stats = PlayerStat.objects.filter(game_id__in=games.values('id'), is_opponent=False)
+        avg_key = Cast(TruncDate("game__date"), output_field=DateField())
+        chart_type = "date"
     else:
         games = Game.objects.all()
         opponent_stats = PlayerStat.objects.filter(is_opponent=True)
         ally_stats = PlayerStat.objects.filter(is_opponent=False)
+        avg_key = Cast("game__season", output_field=IntegerField())
+        chart_type = "integer"
 
     # Compute winrate
     winrate = games.aggregate(
@@ -150,18 +153,18 @@ def team_stats(request):
     }
 
     moving_averages = ally_stats.annotate(
-        as_date=Cast(TruncDate("game__date"), output_field=DateField())
-    ).values("as_date").annotate(
+        avg_key=avg_key
+    ).values("avg_key").annotate(
         avg_scored=Avg("scored"),
         avg_kills=Avg("kills"),
         avg_assists=Avg("assists"),
         avg_result=Avg("result")
-    ).values("as_date", *avg_names).order_by("as_date")
+    ).order_by("avg_key")
 
     labels = []
     datasets = {}
     for point in moving_averages:
-        date_label = str(point["as_date"])
+        date_label = str(point["avg_key"])
         labels.append(date_label)
         for value_name in avg_names:
             if value_name in datasets:
@@ -190,6 +193,7 @@ def team_stats(request):
         "color_values": color_values,
         "url_get_encode": url_get_encode,
         "filter_form": filter_form,
+        "chart_type": chart_type,
     }
 
     return render(request, "stats/team_stats.html", context)
@@ -222,8 +226,12 @@ def player_detail(request, pseudo):
 
     if season_filter:
         player_stats = PlayerStat.objects.filter(game__season=season_filter, is_opponent=False, pseudo=pseudo)
+        chart_type = "date"
+        avg_key = Cast(TruncDate("game__date"), output_field=DateField())
     else:
         player_stats = PlayerStat.objects.filter(is_opponent=False, pseudo=pseudo)
+        chart_type = "integer"
+        avg_key = Cast("game__season", output_field=IntegerField())
 
     num_games = len(player_stats)
 
@@ -252,18 +260,18 @@ def player_detail(request, pseudo):
         "avg_result": "Résultat moyen"
     }
     moving_averages = player_stats.annotate(
-        as_date=Cast(TruncDate("game__date"), output_field=DateField())
-    ).values("as_date").annotate(
+        avg_key=avg_key
+    ).values("avg_key").annotate(
         avg_scored=Avg("scored"),
         avg_kills=Avg("kills"),
         avg_assists=Avg("assists"),
         avg_result=Avg("result")
-    ).values("as_date", *avg_names).order_by("as_date")
+    ).values("avg_key", *avg_names).order_by("avg_key")
 
     labels = []
     datasets = {}
     for point in moving_averages:
-        date_label = str(point["as_date"])
+        date_label = str(point["avg_key"])
         labels.append(date_label)
         for value_name in avg_names:
             if value_name in datasets:
@@ -289,6 +297,7 @@ def player_detail(request, pseudo):
         "verbose_names": verbose_names,
         "color_values": color_values,
         "filter_form": filter_form,
+        "chart_type": chart_type,
     }
 
     return render(request, "stats/player_detail.html", context)

@@ -31,7 +31,11 @@
         </div>
         <h2>Évolution des performances</h2>
         <p>Ces valeurs indiquent le score quotidien moyenné sur tous les joueurs de l'équipe.</p>
-        {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+        {% if chart_type == "date" %}
+            {% include "stats/time_chart.html" with canvas_id="moving-avg" %}
+        {% else %}
+            {% include "stats/integer_chart.html" with canvas_id="moving-avg" %}
+        {% endif %}
     {% endif %}
     <p></p>
 {% endblock %}
