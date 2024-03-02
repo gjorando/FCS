@@ -63,8 +63,8 @@ class GamesListFilterForm(forms.Form):
     """
 
     per_page = forms.IntegerField(label="Éléments par page", label_suffix="", min_value=1, initial=10, required=False)
-    season = DBFieldModelChoiceField(queryset=Season.objects.all(), label="Saison", display_field="number",
-                                     label_suffix="", initial=None, required=False)
+    season = DBFieldModelChoiceField(queryset=Season.objects.all().order_by("number"), label="Saison",
+                                     display_field="number", label_suffix="", initial=None, required=False)
 
     def clean_per_page(self):
         return self.cleaned_data["per_page"] or 10
@@ -78,8 +78,8 @@ class TeamStatFilterForm(forms.Form):
     Form for the team statistics page.
     """
 
-    season = DBFieldModelChoiceField(queryset=Season.objects.all(), label="Saison", display_field="number",
-                                     label_suffix="", initial=None, required=False)
+    season = DBFieldModelChoiceField(queryset=Season.objects.all().order_by("number"), label="Saison",
+                                     display_field="number", label_suffix="", initial=None, required=False)
 
     def clean_season(self):
         return self.cleaned_data["season"] or None
