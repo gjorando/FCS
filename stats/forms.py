@@ -143,5 +143,4 @@ class BulkImportForm(forms.Form):
                                validators=[FileExtensionValidator(("csv",),
                                                                   "Fichier csv uniquement")])
     season = DBFieldModelChoiceField(queryset=Season.objects.all().order_by("number"), label="Saison",
-                                     display_field="number", label_suffix="", initial=Season.objects.latest(),
-                                     required=True)
+                                     display_field="number", label_suffix="", required=True)
