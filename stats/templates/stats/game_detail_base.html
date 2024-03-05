@@ -1,6 +1,6 @@
 {% load stats_extra %}
 
-<div class="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-400">
+<div class="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-50">
 {% for team in game.teams %}
     <div class="p-2 grid grid-cols-2 gap-2 justify-items-stretch">
         <span class="font-bold {{ forloop.counter0|yesno:'game-detail-opponent,game-detail-ally' }}">Joueur</span>

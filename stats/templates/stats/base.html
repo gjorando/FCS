@@ -11,8 +11,8 @@
         <link rel="shortcut icon" type="image/png" href="{% static 'stats/img/favicon.png' %}"/>
         {% block extra_head %}{% endblock %}
     </head>
-    <body class="bg-gray-100">
-        <div class="container mx-auto flex flex-col divide-y divide-gray-400">
+    <body>
+        <div class="container mx-auto flex flex-col divide-y divide-slate-50">
         <header class="flex flex-col justify-center items-center justify-content-center lg:flex-row gap-4 lg:gap-16">
             <a href="{% url 'games_list' %}"><img class="h-28" src="{% static 'stats/img/logo.svg' %}" alt="FC Saucisse"></a>
             <h1 class="text-center font-bold text-6xl self-center">Analyseur de jeu</h1>

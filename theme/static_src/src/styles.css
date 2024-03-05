@@ -4,6 +4,11 @@
 
 /* GENERAL RULES */
 
+body
+{
+    @apply bg-gray-700 text-slate-50;
+}
+
 main, footer, header
 {
     @apply p-5;
@@ -16,7 +21,7 @@ nav > div
 
 nav > div > a
 {
-    @apply p-2 text-center md:self-stretch md:flex md:items-center hover:bg-gray-200;
+    @apply p-2 text-center md:self-stretch md:flex md:items-center hover:bg-slate-800;
 }
 
 main h1
@@ -36,7 +41,7 @@ main p
 
 main a, footer a, .link-like
 {
-    @apply text-blue-800 hover:underline;
+    @apply text-sky-100 hover:underline;
 }
 
 pre
@@ -44,21 +49,45 @@ pre
     @apply whitespace-pre-wrap;
 }
 
+/* FORMS */
+
+input, select
+{
+    @apply text-gray-700;
+}
+
 /* GAME_DETAIL_BASE SPECIAL RULES*/
 
 .game-detail-ally
 {
-    @apply text-green-800;
+    @apply text-green-100;
 }
 
 .game-detail-opponent
 {
-    @apply text-red-800;
+    @apply text-red-100;
 }
 
 .game-detail-mvp
 {
-    @apply bg-yellow-400 rounded-md;
+    @apply bg-amber-700 rounded-md p-1;
+}
+
+/* TEAM_STATS SPECIAL RULES */
+
+.best-matchup
+{
+    @apply text-green-100;
+}
+
+.worst-matchup
+{
+    @apply text-red-100;
+}
+
+.chartjs
+{
+    @apply bg-slate-100 p-1;
 }
 
 @layer components

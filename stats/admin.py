@@ -12,6 +12,7 @@ from .forms import PlayerInlineAdminForm, PrefillForm, BulkImportForm, GameAdmin
 from .models import Game, PlayerStat, Teammate, Pokemon, Season
 from .utils import prefill_game, bulk_import
 
+admin.AdminSite.site_header = "Données du FCS"
 
 DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
 DEFAULT_POKEMONS = ["ZERAORA", "LUCARIO", "PIKACHU", "CRAMORANT", "SNORLAX"]
