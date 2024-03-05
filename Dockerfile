@@ -24,7 +24,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
   && apt-get clean
 
-ADD . /app/
+ADD requirements.txt /app/
 RUN pip install -r /app/requirements.txt
+
+ADD . /app/
 RUN cd /app && python manage.py tailwind install
 
