@@ -1,0 +1,130 @@
+{
+  "_id": "fcs_pages",
+  "startUrl": [
+    "https://uniteapi.dev/fr/p/FCS_RennKane"
+  ],
+  "selectors": [
+    {
+      "id": "pages",
+      "multiple": true,
+      "parentSelectors": [
+        "_root"
+      ],
+      "selector": ".dKRkDg .sc-17dce764-0 > div",
+      "type": "SelectorElement"
+    },
+    {
+      "clickActionType": "real",
+      "clickElementSelector": "div.sc-20c903f9-0",
+      "clickElementUniquenessType": "uniqueCSSSelector",
+      "clickType": "clickOnce",
+      "delay": 350,
+      "discardInitialElements": "discard",
+      "id": "games",
+      "multiple": true,
+      "parentSelectors": [
+        "pages"
+      ],
+      "selector": "> div:nth-of-type(n+2)",
+      "type": "SelectorElementClick"
+    },
+    {
+      "id": "team_results",
+      "multiple": true,
+      "parentSelectors": [
+        "games"
+      ],
+      "regex": "",
+      "selector": "th p.sc-7bda52f2-1",
+      "type": "SelectorText"
+    },
+    {
+      "id": "player",
+      "multiple": false,
+      "parentSelectors": [
+        "data"
+      ],
+      "regex": "",
+      "selector": "td:nth-of-type(2)",
+      "type": "SelectorText"
+    },
+    {
+      "id": "score",
+      "multiple": false,
+      "parentSelectors": [
+        "data"
+      ],
+      "regex": "",
+      "selector": "td:nth-of-type(3)",
+      "type": "SelectorText"
+    },
+    {
+      "id": "stats",
+      "multiple": false,
+      "parentSelectors": [
+        "data"
+      ],
+      "regex": "",
+      "selector": "td:nth-of-type(4)",
+      "type": "SelectorText"
+    },
+    {
+      "id": "data",
+      "multiple": true,
+      "parentSelectors": [
+        "games"
+      ],
+      "selector": "tr:nth-of-type(n+2)",
+      "type": "SelectorElement"
+    },
+    {
+      "id": "game_result",
+      "multiple": false,
+      "parentSelectors": [
+        "games_metadata"
+      ],
+      "regex": "",
+      "selector": "p.sc-7bda52f2-1",
+      "type": "SelectorText"
+    },
+    {
+      "id": "games_metadata",
+      "multiple": true,
+      "parentSelectors": [
+        "pages"
+      ],
+      "selector": "div.sc-20c903f9-0",
+      "type": "SelectorElement"
+    },
+    {
+      "id": "surrendered",
+      "multiple": false,
+      "parentSelectors": [
+        "games_metadata"
+      ],
+      "regex": "",
+      "selector": ".sc-20c903f9-3 p.kIFkaA",
+      "type": "SelectorText"
+    },
+    {
+      "id": "date",
+      "multiple": false,
+      "parentSelectors": [
+        "games_metadata"
+      ],
+      "regex": "",
+      "selector": "p.eAUJiU",
+      "type": "SelectorText"
+    },
+    {
+      "extractAttribute": "src",
+      "id": "pkm_img",
+      "multiple": false,
+      "parentSelectors": [
+        "data"
+      ],
+      "selector": "img[alt='Played pokemon']",
+      "type": "SelectorElementAttribute"
+    }
+  ]
+}

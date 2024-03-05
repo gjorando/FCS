@@ -1,15 +1,16 @@
 from functools import partialmethod
 
 import pyocr
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.urls import path
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from .forms import PlayerInlineAdminForm, PrefillForm, GameAdminForm, PokemonChoiceField, DBFieldModelChoiceField
+from .forms import PlayerInlineAdminForm, PrefillForm, BulkImportForm, GameAdminForm, PokemonChoiceField, \
+     DBFieldModelChoiceField
 from .models import Game, PlayerStat, Teammate, Pokemon, Season
-from .utils import prefill_game
+from .utils import prefill_game, bulk_import
 
 
 DEFAULT_PLAYERS = ["Jejy", "AliceCheshir", "Leutik", "Helizen", "Renn_Kane"]
@@ -122,7 +123,8 @@ class GameAdmin(admin.ModelAdmin):
 
         urls = super().get_urls()
         extra_urls = [
-            path("prefill", self.admin_prefill, name="stats_game_prefill")
+            path("prefill", self.admin_prefill, name="stats_game_prefill"),
+            path("bulk_import", self.admin_bulk_import, name="stats_game_bulk_import")
         ]
 
         return extra_urls + urls
@@ -169,6 +171,47 @@ class GameAdmin(admin.ModelAdmin):
         if "prefilled_img" in request.session:
             del request.session["prefilled_img"]
 
+    def admin_bulk_import(self, request):
+        """
+        Custom admin view that enables for the bulk import of a Web Scraper csv export from uniteapi.dev.
+        """
+
+        if request.method == "POST":
+            bulk_import_form = BulkImportForm(request.POST, request.FILES)
+            if bulk_import_form.is_valid():
+                csv_file = bulk_import_form.cleaned_data["csv_file"]
+                season = bulk_import_form.cleaned_data["season"]
+
+                try:
+                    num_games = bulk_import(csv_file, season)
+                except ValueError as e:
+                    messages.error(request, e)
+                    return HttpResponseRedirect(reverse('admin:stats_game_bulk_import'))
+
+                messages.success(
+                    request,
+                    f"Successfully imported {num_games} game{'s' if num_games != 1 else ''}"
+                )
+                return HttpResponseRedirect(reverse('admin:stats_game_add'))
+        else:
+            bulk_import_form = BulkImportForm()
+
+        base_context = self.admin_site.each_context(request)
+        context = base_context | {
+            "title": "Importation de partie",
+            "opts": Game._meta,
+            "form": bulk_import_form,
+            "display_message": "Téléverser un export csv Web Scraper de uniteapi.dev "
+                               "pour importer plusieurs parties d'un coup."
+        }
+
+        messages.warning(
+            request,
+            "Le score de chaque joueur n'est pas scrapé, "
+            "il faut donc l'ajouter manuellement après chaque import."
+        )
+        return TemplateResponse(request, "stats/admin_custom_form.html", context)
+
     def admin_prefill(self, request):
         """
         Custom admin view that loads a result screenshot to prefill the admin Game form.
@@ -182,16 +225,12 @@ class GameAdmin(admin.ModelAdmin):
         try:
             ocr_tool = pyocr.get_available_tools()[0]
         except IndexError:
-            # FIXME use proper error page
-            print("No OCR tool found")
+            messages.error(request, "Aucun OCR installé pour PyOCR")
             return HttpResponseRedirect(reverse('admin:stats_game_add'))
 
         if "eng" not in ocr_tool.get_available_languages():
-            # FIXME use proper error page
-            print("English is not available")
+            messages.error("L'anglais n'est pas disponible dans les langues de l'OCR")
             return HttpResponseRedirect(reverse('admin:stats_game_add'))
-
-        opts = Game._meta
 
         if request.method == "POST":
             prefill_form = PrefillForm(request.POST, request.FILES)
@@ -205,11 +244,12 @@ class GameAdmin(admin.ModelAdmin):
         base_context = self.admin_site.each_context(request)
         context = base_context | {
             "title": "Pré-remplissage de partie",
-            "opts": opts,
+            "opts": Game._meta,
             "form": prefill_form,
+            "display_message": "Téléverser un écran de résultat pour pré-remplir le formulaire de création de partie."
         }
 
-        return TemplateResponse(request, "stats/admin_prefill.html", context)
+        return TemplateResponse(request, "stats/admin_custom_form.html", context)
 
 
 @admin.register(Pokemon)
@@ -247,4 +287,3 @@ class SeasonAdmin(admin.ModelAdmin):
     """
 
     ordering = ("-number",)
-

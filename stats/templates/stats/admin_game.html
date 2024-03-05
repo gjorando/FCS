@@ -7,4 +7,5 @@
     <img src="data:image/png;base64,{{ img.1 }}" alt="img">
     <p><a href="{% url opts|admin_urlname:'prefill' %}?del">Supprimer l'image du cache</a></p>
 {% endif %}
+<p><a href="{% url opts|admin_urlname:'bulk_import' %}">Importer des parties</a></p>
 {% endblock %}

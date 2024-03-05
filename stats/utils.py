@@ -2,9 +2,15 @@
 Various helper functions.
 """
 
+import csv
+import os
 from io import BytesIO
 from base64 import b64encode
+from datetime import datetime
 from PIL import Image, ImageDraw, ImageEnhance, ImageOps
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
+from stats.models import Game, PlayerStat, Pokemon, Teammate
 
 
 def construct_game_context(game):
@@ -130,3 +136,130 @@ def prefill_game(img, ocr_tool):
     preview_img = b64encode(output.read()).decode("ascii")
 
     return result, preview_img
+
+
+def chunked(seq, chunksize):
+    """
+    Yields items from an iterator in list chunks.
+
+    :param seq: Iterator.
+    :param chunksize: Size of a chunk.
+    """
+
+    for pos in range(0, len(seq), chunksize):
+        yield seq[pos:pos + chunksize]
+
+
+@transaction.atomic
+def bulk_import(csv_file, season):
+    """
+    Bulk import a csv web scraper dump into database.
+
+    :param csv_file: An uploaded file that implements the .open() method.
+    :param season: Season number.
+    :return: Number of games added.
+    """
+
+    # Dictionary of Pokémon DB IDs, indexed by their name
+    pokemons = {p.name.lower(): p.id for p in Pokemon.objects.all()}
+
+    # Special cases, because uniteapi.dev doesn't have the same naming scheme as ours
+    pokemons["meowscara"] = pokemons.pop("meowscarada")
+    pokemons["ninetales"] = pokemons.pop("alolan ninetales")
+    pokemons["mewtwox"] = pokemons.pop("mewtwo x")
+    pokemons["mewtwoy"] = pokemons.pop("mewtwo y")
+    pokemons["urshifu_rapid"] = pokemons.pop("urshifu")
+    pokemons["urshifu_single"] = pokemons["urshifu_rapid"]
+    pokemons["mrmime"] = pokemons.pop("mr. mime")
+
+    # Load the csv into a list of rows
+    rows = []
+    with csv_file.open() as fp:
+        csv_reader = csv.reader((line.decode() for line in fp))
+        for row in csv_reader:
+            rows.append(row)
+    rows = rows[1:]  # Skip the header
+
+    # 13 lines per game (2 for the result of each team, 10 player lines, and one empty line), + 1 for game metadata
+    if not (len(rows) / 14).is_integer():
+        raise ValueError("Line count should be a multiple of 14")
+    num_games = int(len(rows) / 14)
+    games_data = rows[:num_games * 13]
+    games_metadata = rows[num_games * 13:]
+
+    # Iterate over each game and create our objects
+    for metadata, data in zip(games_metadata, chunked(games_data, 13)):
+        # Process general information about the game, and assert which team is which
+        is_won = not metadata[6].lower().startswith("l")
+        is_forfeit = bool(metadata[7])
+        team_a_won, team_a_score = data[0][2].split(" - ")
+        team_a_won = team_a_won.lower().startswith("v")
+        team_a_players = data[2:7]
+        team_b_won, team_b_score = data[1][2].split(" - ")
+        team_b_players = data[8:]
+
+        # Check which team has the same result as our team, which is known from is_won
+        if team_a_won == is_won:
+            allies_score = team_a_score
+            allies = team_a_players
+            opponents_score = team_b_score
+            opponents = team_b_players
+        else:
+            allies_score = team_b_score
+            allies = team_b_players
+            opponents_score = team_a_score
+            opponents = team_a_players
+
+        game = Game(
+            is_won=is_won,
+            is_forfeit=is_forfeit,
+            date=datetime.strptime(metadata[8], "%d-%m-%Y %H:%M"),
+            score_allies=allies_score,
+            score_opponents=opponents_score,
+            season=season
+        )
+        game.save()
+
+        # Give a unique name to bots
+        for i, p in enumerate(opponents):
+            if p[3] == "BOT":  # FIXME let's hope the player named "BOT" doesn't come back one day
+                p[3] = f"BOT_{i}"
+                # FIXME we should implement a way of formally identifying bots in database
+
+        # Process the PlayerStat entries associated with the current game
+        for i, p in enumerate(allies + opponents):
+            kills, assists, _ = (int(n) for n in p[5].split("|"))
+            scored = p[4]
+
+            # Try to identify the player's Pokémon based on the image url used in uniteapi.dev
+            pkm_img = p[9]
+            pkm_from_img = os.path.splitext(os.path.split(pkm_img)[1])[0].split("_")
+            pkm_from_img = "_".join(pkm_from_img[pkm_from_img.index("Square") + 1:]).lower()
+            try:
+                found_pkm = Pokemon.objects.get(id=pokemons[pkm_from_img])
+            except KeyError:
+                raise ValueError(f"No pokémon found in {pkm_img}")
+
+            # FIXME
+            player_name = "Renn_Kane" if p[3] == "FCS_RennKane" else "AliceCheshir" if p[3] == "FCS_Alice" else p[3]
+            is_ally = i < 5  # First five players are allies
+            if is_ally:  # Check that the ally is a teammate
+                try:
+                    Teammate.objects.get(pseudo=player_name)
+                except ObjectDoesNotExist:
+                    raise ValueError(f"{player_name} n'est pas un teammate enregistré")
+
+            ps = PlayerStat(
+                game=game,
+                pseudo=player_name,
+                is_opponent=not is_ally,
+                scored=scored,
+                kills=kills,
+                assists=assists,
+                result=0,
+                pokemon=found_pkm
+            )
+            print(ps)
+            ps.save()
+
+    return num_games

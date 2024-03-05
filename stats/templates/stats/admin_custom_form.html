@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    <p>Téléverser un écran de résultat pour préremplir le formulaire de création de partie.</p>
+    <p>{{ display_message }}</p>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

@@ -1,6 +1,7 @@
 from django import forms
 
 from stats.models import PlayerStat, Game, Season
+from django.core.validators import FileExtensionValidator
 
 
 class PokemonChoiceIterator(forms.models.ModelChoiceIterator):
@@ -130,4 +131,17 @@ class PrefillForm(forms.Form):
     Form for the prefill admin view.
     """
 
-    picture = forms.FileField(label="Écran de résultat")
+    picture = forms.FileField(label="Écran de résultat")  # FIXME forms.ImageField
+
+
+class BulkImportForm(forms.Form):
+    """
+    Form for the prefill admin view.
+    """
+
+    csv_file = forms.FileField(label="Fichier .csv de scraping",
+                               validators=[FileExtensionValidator(("csv",),
+                                                                  "Fichier csv uniquement")])
+    season = DBFieldModelChoiceField(queryset=Season.objects.all().order_by("number"), label="Saison",
+                                     display_field="number", label_suffix="", initial=Season.objects.latest(),
+                                     required=True)
