@@ -15,3 +15,5 @@ Utiliser `./manage.py collectstatic/migrate/createsuperuser` et `./manage.py tai
 * Ne pas utiliser de CDN pour ChartJS
 * Documentation
 * Refactoriser (code plus compliant avec la dernière version de Django)
+* Option pour exclure les bots
+* Séparer les stats selon que les games soient gagnées ou perdues
